@@ -1,0 +1,8 @@
+title: MessageResponseDto
+properties:
+  level:
+    type: string
+    enum: [INFO, WARNING, ERROR]
+  message:
+    type: string
+    description: Localized message with parameters (if available)

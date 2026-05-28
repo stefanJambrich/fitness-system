@@ -2,6 +2,8 @@ openapi: 3.0.3
 info:
   title: Fitness System API
   version: 1.0.0
+servers:
+  - url: http://localhost:8080
 paths:
   /ping:
     get:
@@ -15,3 +17,24 @@ paths:
               schema:
                 type: string
                 example: pong
+  /auth/api/v1/otp:
+    post:
+      summary: Request OTP for authentication
+      operationId: requestOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              example: "email@domain.com"
+      x-codegen-request-body-name: email
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: './components/responses/MessageResponseDto.yaml'
+        '400':
+          $ref: './components/responses/MessageResponseDto.yaml'
