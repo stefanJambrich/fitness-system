@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: Fitness System API
+  version: 1.0.0
+paths:
+  /ping:
+    get:
+      summary: Health check ping
+      operationId: pingGet
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+                example: pong
