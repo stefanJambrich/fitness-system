@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -29,7 +33,7 @@ public class User {
     private Integer availableCredits = 0;
 
     @Column(name = "created_at", insertable = false, updatable = false)
-    private java.time.OffsetDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @ManyToMany
     @JoinTable(
@@ -37,5 +41,5 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    private java.util.Set<Role> roles = new java.util.HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 }
