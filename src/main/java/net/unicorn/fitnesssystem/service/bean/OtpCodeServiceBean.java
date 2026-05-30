@@ -4,9 +4,11 @@ import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import net.unicorn.fitnesssystem.annotations.ReadOnlyTransaction;
 import net.unicorn.fitnesssystem.annotations.ReadWriteTransaction;
+import net.unicorn.fitnesssystem.api.model.OtpVerificationRequestDto;
 import net.unicorn.fitnesssystem.entity.OtpCode;
+import net.unicorn.fitnesssystem.exceptions.ApplicationException;
 import net.unicorn.fitnesssystem.repository.OtpCodeRepository;
-import net.unicorn.fitnesssystem.service.EmailService;
+import net.unicorn.fitnesssystem.service.EmailSenderService;
 import net.unicorn.fitnesssystem.service.OtpCodeService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,7 @@ import java.util.Random;
 public class OtpCodeServiceBean implements OtpCodeService {
 
     private final OtpCodeRepository otpCodeRepository;
-    private final EmailService emailService;
+    private final EmailSenderService emailSenderService;
     private final BCryptPasswordEncoder passwordEncoder;
 
     private static final int EXPIRATION_MINUTES = 10;
@@ -34,6 +36,8 @@ public class OtpCodeServiceBean implements OtpCodeService {
         String plainOtp = generatePlainOtp();
         String hashedOtp = passwordEncoder.encode(plainOtp);
 
+        log.info("CODE: {}", plainOtp);
+
         OffsetDateTime expiresAt = OffsetDateTime.now().plusMinutes(EXPIRATION_MINUTES);
         OtpCode otpCode = new OtpCode();
         otpCode.setEmail(email);
@@ -44,8 +48,9 @@ public class OtpCodeServiceBean implements OtpCodeService {
         otpCodeRepository.save(otpCode);
         log.info("OTP saved to database with expiration: {}", expiresAt);
 
-        //TODO: After implementation this is probably gonna be throwing excpetions, should implement some failsafe handling on api level
-        emailService.sendOtpEmail(email, plainOtp);
+        //TODO: After implementation this is probably gonna be throwing excpetions,
+        // should implement some failsafe handling on api level for general errors
+        emailSenderService.sendOtpEmail(email, plainOtp);
         log.info("OTP email sent to: {}", email);
     }
 
@@ -57,31 +62,26 @@ public class OtpCodeServiceBean implements OtpCodeService {
 
     @Override
     @ReadWriteTransaction
-    public boolean validateOtp(String email, String plainOtp) {
+    public void validateOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
+        var email = otpVerificationRequestDto.getEmail();
         var otpCode = otpCodeRepository.findByEmailAndIsUsedFalse(email);
 
         if (otpCode.isEmpty()) {
-            log.warn("No valid OTP found for email: {}", email);
-            return false;
+            throw new ApplicationException("No valid OTP found for email: " + email);
         }
 
         OtpCode otp = otpCode.get();
-
         if (OffsetDateTime.now().isAfter(otp.getExpiresAt())) {
-            log.warn("OTP expired for email: {}", email);
-            return false;
+            throw new ApplicationException("OTP has expired");
         }
 
-        boolean isValid = passwordEncoder.matches(plainOtp, otp.getCodeHash());
-
-        if (isValid) {
-            otp.setIsUsed(true);
-            otpCodeRepository.save(otp);
-            log.info("OTP validated and marked as used for email: {}", email);
-        } else {
-            log.warn("OTP validation failed for email: {}", email);
+        boolean isValid = passwordEncoder.matches(otpVerificationRequestDto.getCode(), otp.getCodeHash());
+        if (!isValid) {
+            throw new ApplicationException("Invalid OTP code");
         }
 
-        return isValid;
+        otp.setIsUsed(true);
+        otpCodeRepository.save(otp);
+        log.info("OTP validated and marked as used for email: {}", email);
     }
 }

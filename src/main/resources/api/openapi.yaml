@@ -21,14 +21,14 @@ paths:
     post:
       summary: Request OTP for authentication
       operationId: requestOtp
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: string
-              example: "email@domain.com"
-      x-codegen-request-body-name: email
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "email@domain.com"
+            pattern: "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
       responses:
         '200':
           description: OTP sent successfully
@@ -38,3 +38,41 @@ paths:
                 $ref: './components/responses/MessageResponseDto.yaml'
         '400':
           $ref: './components/responses/MessageResponseDto.yaml'
+  /auth/api/v1/otp/verify:
+    post:
+      summary: Verifies OTP for authentication
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './components/schemas/auth/OtpVerificationRequestDto.yaml'
+      responses:
+        '200':
+          description: OTP verified successfully
+          headers:
+            Set-Cookie:
+              description: Relation token (HTTPOnly). Returned only if the logging in user has the TRAINER role.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtpVerifyResponseDto'
+        '202':
+          description: OTP is valid, but user is not registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OtpVerifyResponseDto'
+        '400':
+            $ref: './components/responses/MessageResponseDto.yaml'
+        '401':
+            $ref: './components/responses/MessageResponseDto.yaml'
+components:
+  schemas:
+    OtpVerifyResponseDto:
+      oneOf:
+        - $ref: './components/schemas/auth/OtpVerificationUserResponseDto.yaml'
+        - $ref: './components/schemas/auth/OtpVerificationNewUserResponseDto.yaml'

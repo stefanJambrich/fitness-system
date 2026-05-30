@@ -1,0 +1,15 @@
+title: OtpVerificationRequestDto
+type: object
+required:
+  - email
+  - code
+properties:
+  email:
+    type: string
+    example: "email@domain.com"
+    pattern: "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+  code:
+    type: string
+    example: "123456"
+  publicHashKey:
+    type: string

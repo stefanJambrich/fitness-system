@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.unicorn.fitnesssystem.entity.enums.ReservationStatusEnum;
+import net.unicorn.fitnesssystem.enums.ReservationStatusEnum;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;

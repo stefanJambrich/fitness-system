@@ -1,0 +1,12 @@
+title: OtpVerificationNewUserResponseDto
+type: object
+required:
+  - status
+  - register_token
+properties:
+  status:
+    type: string
+    example: REGISTRATION_REQUIRED
+  register_token:
+    type: string
+    example: "eyJhbGciOi..."

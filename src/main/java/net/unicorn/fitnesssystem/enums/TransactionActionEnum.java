@@ -1,4 +1,4 @@
-package net.unicorn.fitnesssystem.entity.enums;
+package net.unicorn.fitnesssystem.enums;
 
 public enum TransactionActionEnum {
     RECHARGE, DEDUCT, REFUND

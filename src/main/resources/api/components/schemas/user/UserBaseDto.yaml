@@ -1,0 +1,22 @@
+title: UserBaseDto
+type: object
+required:
+  - id
+  - email
+  - name
+  - role
+properties:
+  id:
+    type: integer
+    example: 12
+  email:
+    type: string
+    format: email
+    example: karel@example.com
+  name:
+    type: string
+    example: Karel
+  role:
+    type: string
+    enum: [MEMBER, TRAINER]
+    example: MEMBER

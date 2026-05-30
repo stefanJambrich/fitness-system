@@ -2,7 +2,7 @@ package net.unicorn.fitnesssystem.helper;
 
 import net.unicorn.fitnesssystem.api.model.MessageResponseDto;
 
-public class ResponseBuilder {
+public class MessageBuilder {
 
     public static MessageResponseDto success(String message) {
         var response = new MessageResponseDto();
