@@ -4,7 +4,9 @@ import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import net.unicorn.fitnesssystem.annotations.ReadOnlyTransaction;
 import net.unicorn.fitnesssystem.api.model.OtpVerificationUserResponseDto;
-import net.unicorn.fitnesssystem.enums.UserRoleEnum;
+import net.unicorn.fitnesssystem.entity.User;
+import net.unicorn.fitnesssystem.exceptions.ApplicationException;
+import net.unicorn.fitnesssystem.mapper.AuthMapper;
 import net.unicorn.fitnesssystem.repository.UserRepository;
 import net.unicorn.fitnesssystem.service.UserService;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceBean implements UserService {
 
     private final UserRepository userRepository;
+    private final AuthMapper authMapper;
 
     @Override
     public boolean userExists(String email) {
@@ -24,6 +27,9 @@ public class UserServiceBean implements UserService {
 
     @Override
     public OtpVerificationUserResponseDto getExistingUserByEmail(String email) {
-        return null;
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException("User not found for email: " + email));
+
+        return authMapper.toExistingUserResponse(user);
     }
 }

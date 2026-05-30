@@ -4,18 +4,14 @@ import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import net.unicorn.fitnesssystem.api.AuthApi;
 import net.unicorn.fitnesssystem.api.model.*;
-import net.unicorn.fitnesssystem.enums.UserRoleEnum;
 import net.unicorn.fitnesssystem.helper.MessageBuilder;
-import net.unicorn.fitnesssystem.service.DeviceService;
-import net.unicorn.fitnesssystem.service.JwtService;
+import net.unicorn.fitnesssystem.service.AuthService;
 import net.unicorn.fitnesssystem.service.OtpCodeService;
-import net.unicorn.fitnesssystem.service.UserService;
+import net.unicorn.fitnesssystem.service.OtpVerificationResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @CustomLog
 @RestController
@@ -23,9 +19,7 @@ import java.util.List;
 public class AuthApiController implements AuthApi {
 
     private final OtpCodeService otpCodeService;
-    private final UserService userService;
-    private final JwtService jwtService;
-    private final DeviceService deviceService;
+    private final AuthService authService;
 
     @Override
     public ResponseEntity<MessageResponseDto> requestOtp(String email) {
@@ -37,39 +31,24 @@ public class AuthApiController implements AuthApi {
 
     @Override
     public ResponseEntity<OtpVerifyResponseDto> verifyOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
-        otpCodeService.validateOtp(otpVerificationRequestDto);
-        if (userService.userExists(otpVerificationRequestDto.getEmail())) {
-            log.info("User with email {} exists", otpVerificationRequestDto.getEmail());
-            OtpVerificationNewUserResponseDto responseDto = new OtpVerificationNewUserResponseDto();
-            responseDto.setStatus("REGISTRATION_REQUIRED");
-            responseDto.setRegisterToken(jwtService.generateRegistrationToken(otpVerificationRequestDto.getEmail()));
+        OtpVerificationResult result = authService.verifyOtp(otpVerificationRequestDto);
 
-            return ResponseEntity.accepted().body(responseDto);
+        if (result.isNewUser()) {
+            return ResponseEntity.accepted().body(result.newUserResponse());
         }
-        var responseExistingUserDto = userService.getExistingUserByEmail(otpVerificationRequestDto.getEmail());
-        if (responseExistingUserDto.getAuthMethod().equals(OtpVerificationUserResponseDto.AuthMethodEnum.SESSION_COOKIE)) {
-            String sessionToken = jwtService.generateSessionToken(
-                    responseExistingUserDto.getUser().getId().longValue(),
-                    responseExistingUserDto.getUser().getEmail(),
-                    List.of(UserRoleEnum.TRAINER.toString())
-            );
 
-            ResponseCookie cookie = ResponseCookie.from("session_token", sessionToken)
+        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok();
+        if (result.sessionToken() != null) {
+            ResponseCookie cookie = ResponseCookie.from("session_token", result.sessionToken())
                     .httpOnly(true)
                     .secure(true)
                     .sameSite("Strict")
                     .path("/")
                     .maxAge(14400)
                     .build();
-
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body(responseExistingUserDto);
+            responseBuilder.header(HttpHeaders.SET_COOKIE, cookie.toString());
         }
 
-        deviceService.updateUserDevice(responseExistingUserDto.getUser().getId().longValue(), otpVerificationRequestDto.getPublicHashKey());
-        return ResponseEntity.ok(responseExistingUserDto);
+        return responseBuilder.body(result.existingUserResponse());
     }
-
-
 }

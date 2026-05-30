@@ -4,9 +4,8 @@ import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import net.unicorn.fitnesssystem.annotations.ReadOnlyTransaction;
 import net.unicorn.fitnesssystem.annotations.ReadWriteTransaction;
-import net.unicorn.fitnesssystem.api.model.OtpVerificationRequestDto;
 import net.unicorn.fitnesssystem.entity.OtpCode;
-import net.unicorn.fitnesssystem.exceptions.ApplicationException;
+import net.unicorn.fitnesssystem.exceptions.OtpVerificationException;
 import net.unicorn.fitnesssystem.repository.OtpCodeRepository;
 import net.unicorn.fitnesssystem.service.EmailSenderService;
 import net.unicorn.fitnesssystem.service.OtpCodeService;
@@ -62,22 +61,21 @@ public class OtpCodeServiceBean implements OtpCodeService {
 
     @Override
     @ReadWriteTransaction
-    public void validateOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
-        var email = otpVerificationRequestDto.getEmail();
+    public void validateOtp(String email, String code) {
         var otpCode = otpCodeRepository.findByEmailAndIsUsedFalse(email);
 
         if (otpCode.isEmpty()) {
-            throw new ApplicationException("No valid OTP found for email: " + email);
+            throw new OtpVerificationException("No valid OTP found for email: " + email);
         }
 
         OtpCode otp = otpCode.get();
         if (OffsetDateTime.now().isAfter(otp.getExpiresAt())) {
-            throw new ApplicationException("OTP has expired");
+            throw new OtpVerificationException("OTP has expired");
         }
 
-        boolean isValid = passwordEncoder.matches(otpVerificationRequestDto.getCode(), otp.getCodeHash());
+        boolean isValid = passwordEncoder.matches(code, otp.getCodeHash());
         if (!isValid) {
-            throw new ApplicationException("Invalid OTP code");
+            throw new OtpVerificationException("Invalid OTP code");
         }
 
         otp.setIsUsed(true);
