@@ -3,6 +3,7 @@ package net.unicorn.fitnesssystem.config;
 import lombok.CustomLog;
 import net.unicorn.fitnesssystem.api.model.MessageResponseDto;
 import net.unicorn.fitnesssystem.exceptions.ApplicationException;
+import net.unicorn.fitnesssystem.exceptions.DeviceNotFoundException;
 import net.unicorn.fitnesssystem.exceptions.OtpVerificationException;
 import net.unicorn.fitnesssystem.exceptions.RegistrationException;
 import net.unicorn.fitnesssystem.helper.MessageBuilder;
@@ -27,6 +28,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(OtpVerificationException.class)
     public ResponseEntity<MessageResponseDto> handleOtpVerificationException(OtpVerificationException ex) {
         log.error("OTP verification failed: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON)
+                .body(MessageBuilder.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(DeviceNotFoundException.class)
+    public ResponseEntity<MessageResponseDto> handleDeviceNotFoundException(DeviceNotFoundException ex) {
+        log.error("Device not found: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON)
                 .body(MessageBuilder.error(ex.getMessage()));
     }

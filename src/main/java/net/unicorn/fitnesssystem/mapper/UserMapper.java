@@ -14,7 +14,7 @@ public interface UserMapper {
 
     @Mapping(source = "fullname", target = "name")
     @Mapping(source = "roles", target = "role", qualifiedByName = "rolesToRoleEnum")
-    UserBaseDto toUserBaseDto(User user);
+    UserBaseDto mapToUserBaseDto(User user);
 
     @Named("rolesToRoleEnum")
     default UserBaseDto.RoleEnum rolesToRoleEnum(Set<Role> roles) {

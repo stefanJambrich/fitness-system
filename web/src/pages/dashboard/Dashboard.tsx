@@ -1,14 +1,13 @@
-import {useSelector} from "react-redux";
-import type {UserState} from "../../store/userSlice.ts";
+import {useAppSelector} from "../../store/hooks.ts";
 
 export const Dashboard = () => {
-    const user = useSelector((state: UserState) => state.user)
+    const user = useAppSelector(state => state.user);
 
     return (
-        <>
+        <div>
             {
-                user?.fullname
+                user.user?.name
             }
-        </>
+        </div>
     )
 }

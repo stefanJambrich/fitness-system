@@ -7,7 +7,7 @@ import net.unicorn.fitnesssystem.annotations.ReadWriteTransaction;
 import net.unicorn.fitnesssystem.api.model.*;
 import net.unicorn.fitnesssystem.entity.User;
 import net.unicorn.fitnesssystem.exceptions.RegistrationException;
-import net.unicorn.fitnesssystem.mapper.AuthMapper;
+import net.unicorn.fitnesssystem.mapper.UserMapper;
 import net.unicorn.fitnesssystem.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class AuthServiceBean implements AuthService {
     private final UserService userService;
     private final JwtService jwtService;
     private final DeviceService deviceService;
-    private final AuthMapper authMapper;
+    private final UserMapper userMapper;
 
     @Override
     @ReadWriteTransaction
@@ -72,6 +72,6 @@ public class AuthServiceBean implements AuthService {
         deviceService.updateUserDevice(newUser.getId(), request.getPublicKeyHash());
         log.info("Registered new user and device for email: {}", email);
 
-        return authMapper.toUserBaseDto(newUser);
+        return userMapper.mapToUserBaseDto(newUser);
     }
 }

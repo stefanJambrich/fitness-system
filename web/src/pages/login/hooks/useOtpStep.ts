@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { useVerifyOtpApi } from "../api/useVerifyOtpApi.ts";
-import type { VerifyResponse } from "../api/useVerifyOtpApi.ts";
+import {type OtpVerificationResponseDto, useVerifyOtpApi} from "../api/useVerifyOtpApi.ts";
 
 interface UseOtpStepProps {
     email: string;
-    onSuccess: (data: VerifyResponse, status: number) => void;
+    onSuccess: (data: OtpVerificationResponseDto, status: number) => void;
     onBack: () => void;
     clearErrors: () => void;
 }

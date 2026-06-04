@@ -30,6 +30,14 @@ public class OtpCodeServiceBean implements OtpCodeService {
     @Override
     @ReadWriteTransaction
     public void generateAndSendOtp(String email) {
+        var otpCodes = otpCodeRepository.findOtpCodesByEmailAndIsUsedFalse(email);
+        if (!otpCodes.isEmpty()) {
+            for (OtpCode otp : otpCodes) {
+                otp.setIsUsed(true);
+            }
+            otpCodeRepository.saveAll(otpCodes);
+        }
+
         log.info("Generating OTP for email: {}", email);
 
         String plainOtp = generatePlainOtp();

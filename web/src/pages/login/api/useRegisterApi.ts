@@ -10,7 +10,7 @@ export interface RegisterRequest {
     registerAsTrainer?: boolean;
 }
 
-export function useRegisterApi() {
+export const useRegisterApi = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 

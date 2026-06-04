@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRegisterApi } from "../api/useRegisterApi.ts";
 import { useAppDispatch } from "../../../store/hooks.ts";
-import { setUserInfo } from "../../../store/userSlice.ts";
+import { setUser } from "../../../store/userSlice.ts";
 
 interface UseNicknameStepProps {
     registerToken: string;
@@ -22,7 +22,7 @@ export function useNicknameStep({ registerToken, onSuccess }: UseNicknameStepPro
                 name: nickname.trim(),
                 registerAsTrainer,
             });
-            dispatch(setUserInfo({ user: res }));
+            dispatch(setUser(res));
             onSuccess();
         }
     };

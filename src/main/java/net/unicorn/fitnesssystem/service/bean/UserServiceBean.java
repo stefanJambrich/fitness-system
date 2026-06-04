@@ -9,7 +9,7 @@ import net.unicorn.fitnesssystem.entity.Role;
 import net.unicorn.fitnesssystem.entity.User;
 import net.unicorn.fitnesssystem.exceptions.ApplicationException;
 import net.unicorn.fitnesssystem.enums.UserRoleEnum;
-import net.unicorn.fitnesssystem.mapper.AuthMapper;
+import net.unicorn.fitnesssystem.mapper.UserMapper;
 import net.unicorn.fitnesssystem.repository.RoleRepository;
 import net.unicorn.fitnesssystem.repository.UserRepository;
 import net.unicorn.fitnesssystem.service.UserService;
@@ -27,7 +27,7 @@ public class UserServiceBean implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final AuthMapper authMapper;
+    private final UserMapper userMapper;
 
     private final Random random = new Random();
 
@@ -41,7 +41,7 @@ public class UserServiceBean implements UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException("User not found for email: " + email));
 
-        return authMapper.toUserBaseDto(user);
+        return userMapper.mapToUserBaseDto(user);
     }
 
     @Override
