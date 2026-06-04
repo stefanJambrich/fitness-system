@@ -20,3 +20,6 @@ properties:
     type: string
     enum: [MEMBER, TRAINER]
     example: MEMBER
+  availableCredits:
+    type: integer
+    example: 5

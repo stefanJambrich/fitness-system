@@ -1,8 +1,12 @@
 package net.unicorn.fitnesssystem.service.bean;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.CustomLog;
+import net.unicorn.fitnesssystem.exceptions.RegistrationException;
+import org.springframework.http.HttpStatus;
 import net.unicorn.fitnesssystem.annotations.ReadOnlyTransaction;
 import net.unicorn.fitnesssystem.service.JwtService;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +48,7 @@ public class JwtServiceBean implements JwtService {
     @Override
     public String generateSessionToken(Long userId, String email, List<String> roles) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + registrationExpiration);
+        Date expiryDate = new Date(now.getTime() + sessionExpiration);
 
         return Jwts.builder()
                 .subject(String.valueOf(userId))
@@ -55,6 +59,26 @@ public class JwtServiceBean implements JwtService {
                 .claim("roles", roles)
                 .signWith(getSecretKey())
                 .compact();
+    }
+
+    @Override
+    public String extractEmailFromRegistrationToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSecretKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            String type = claims.get("type", String.class);
+            if (!"registration_token".equals(type)) {
+                throw new RegistrationException("Invalid token type", HttpStatus.UNAUTHORIZED);
+            }
+
+            return claims.getSubject();
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new RegistrationException("Registration token is invalid or expired", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     private SecretKey getSecretKey() {

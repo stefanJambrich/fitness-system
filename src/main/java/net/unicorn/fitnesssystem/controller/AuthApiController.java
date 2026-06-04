@@ -51,4 +51,10 @@ public class AuthApiController implements AuthApi {
 
         return responseBuilder.body(result.existingUserResponse());
     }
+
+    @Override
+    public ResponseEntity<OtpVerificationUserResponseDto> registerUser(RegistrationRequestDto registrationRequestDto) {
+        var response = authService.registerUser(registrationRequestDto);
+        return ResponseEntity.ok(response);
+    }
 }

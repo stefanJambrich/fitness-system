@@ -27,7 +27,7 @@ public class OtpCode {
     private OffsetDateTime expiresAt;
 
     @Column(name = "is_used", nullable = false)
-    private Boolean isUsed = false;
+    private Boolean isUsed;
 
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;

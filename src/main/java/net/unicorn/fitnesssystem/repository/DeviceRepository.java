@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface DeviceRepository extends JpaRepository<Device, Long> {
     Optional<Device> findByUserIdAndPublicKeyHash(Long userId, String publicKeyHash);
+
+    boolean existsByPublicKeyHash(String publicKeyHash);
 }

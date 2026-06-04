@@ -4,6 +4,7 @@ import lombok.CustomLog;
 import net.unicorn.fitnesssystem.api.model.MessageResponseDto;
 import net.unicorn.fitnesssystem.exceptions.ApplicationException;
 import net.unicorn.fitnesssystem.exceptions.OtpVerificationException;
+import net.unicorn.fitnesssystem.exceptions.RegistrationException;
 import net.unicorn.fitnesssystem.helper.MessageBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +16,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @CustomLog
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(RegistrationException.class)
+    public ResponseEntity<MessageResponseDto> handleRegistrationException(RegistrationException ex) {
+        log.error("Registration failed: {}", ex.getMessage());
+        return ResponseEntity.status(ex.getStatus()).contentType(MediaType.APPLICATION_JSON)
+                .body(MessageBuilder.error(ex.getMessage()));
+    }
 
     @ExceptionHandler(OtpVerificationException.class)
     public ResponseEntity<MessageResponseDto> handleOtpVerificationException(OtpVerificationException ex) {

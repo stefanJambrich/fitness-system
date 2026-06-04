@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { getOrCreateDeviceKey } from "../utils/deviceKey.ts";
-import type {UserBaseDto} from "../../../commons/api/schemas/UserBaseDto.ts";
+import type { UserBaseDto } from "../../../commons/api/schemas/UserBaseDto.ts";
 
 export interface OtpVerificationUserResponseDto {
     user: UserBaseDto;

@@ -45,4 +45,9 @@ public class DeviceServiceBean implements DeviceService {
             log.info("Registered new device for user: {}", userId);
         }
     }
+
+    @Override
+    public boolean deviceKeyExists(String publicKeyHash) {
+        return deviceRepository.existsByPublicKeyHash(publicKeyHash);
+    }
 }

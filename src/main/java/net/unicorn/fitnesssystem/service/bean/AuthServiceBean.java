@@ -3,11 +3,13 @@ package net.unicorn.fitnesssystem.service.bean;
 import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import net.unicorn.fitnesssystem.annotations.ReadOnlyTransaction;
-import net.unicorn.fitnesssystem.api.model.OtpVerificationNewUserResponseDto;
-import net.unicorn.fitnesssystem.api.model.OtpVerificationRequestDto;
-import net.unicorn.fitnesssystem.api.model.OtpVerificationUserResponseDto;
-import net.unicorn.fitnesssystem.api.model.UserBaseDto;
+import net.unicorn.fitnesssystem.annotations.ReadWriteTransaction;
+import net.unicorn.fitnesssystem.api.model.*;
+import net.unicorn.fitnesssystem.entity.User;
+import net.unicorn.fitnesssystem.exceptions.RegistrationException;
+import net.unicorn.fitnesssystem.mapper.AuthMapper;
 import net.unicorn.fitnesssystem.service.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class AuthServiceBean implements AuthService {
     private final UserService userService;
     private final JwtService jwtService;
     private final DeviceService deviceService;
+    private final AuthMapper authMapper;
 
     @Override
     public OtpVerificationResult verifyOtp(OtpVerificationRequestDto request) {
@@ -59,5 +62,26 @@ public class AuthServiceBean implements AuthService {
         }
 
         return OtpVerificationResult.forExistingUser(existingUserResponse, sessionToken);
+    }
+
+    @Override
+    @ReadWriteTransaction
+    public OtpVerificationUserResponseDto registerUser(RegistrationRequestDto request) {
+        String email = jwtService.extractEmailFromRegistrationToken(request.getRegistrationToken());
+
+        if (userService.userExists(email)) {
+            throw new RegistrationException("User with this email already exists", HttpStatus.CONFLICT);
+        }
+
+        if (deviceService.deviceKeyExists(request.getPublicKeyHash())) {
+            throw new RegistrationException("Device key already registered", HttpStatus.CONFLICT);
+        }
+
+        User newUser = userService.createUser(email, request.getName(), request.getRegisterAsTrainer());
+
+        deviceService.updateUserDevice(newUser.getId(), request.getPublicKeyHash());
+        log.info("Registered new user and device for email: {}", email);
+
+        return authMapper.toExistingUserResponse(newUser);
     }
 }

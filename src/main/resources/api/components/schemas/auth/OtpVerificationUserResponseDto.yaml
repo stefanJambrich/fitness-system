@@ -1,4 +1,4 @@
-title: OtpVerificationSuccessResponseDto
+title: OtpVerificationUserResponseDto
 type: object
 required:
   - user
