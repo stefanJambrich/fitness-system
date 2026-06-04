@@ -47,8 +47,6 @@ public class OtpCodeServiceBean implements OtpCodeService {
         otpCodeRepository.save(otpCode);
         log.info("OTP saved to database with expiration: {}", expiresAt);
 
-        //TODO: After implementation this is probably gonna be throwing excpetions,
-        // should implement some failsafe handling on api level for general errors
         emailSenderService.sendOtpEmail(email, plainOtp);
         log.info("OTP email sent to: {}", email);
     }

@@ -18,7 +18,7 @@ import java.util.List;
 @ReadOnlyTransaction
 public class JwtServiceBean implements JwtService {
 
-    @Value("${app.security.jwt.secret}")
+    @Value("${application.security.jwt.secret}")
     private String secretKey;
 
     @Value("${application.security.jwt.registration-expiration}")
