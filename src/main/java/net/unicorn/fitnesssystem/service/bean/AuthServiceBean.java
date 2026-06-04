@@ -12,8 +12,6 @@ import net.unicorn.fitnesssystem.service.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @CustomLog
 @Service
 @RequiredArgsConstructor
@@ -27,9 +25,12 @@ public class AuthServiceBean implements AuthService {
     private final AuthMapper authMapper;
 
     @Override
-    public OtpVerificationResult verifyOtp(OtpVerificationRequestDto request) {
+    @ReadWriteTransaction
+    public OtpVerificationResponseDto verifyOtp(OtpVerificationRequestDto request) {
+        log.info("Verifying otp code: {}", request.getCode());
         String email = request.getEmail().replaceAll("\\s+", "").toLowerCase();
         String code = request.getCode();
+        OtpVerificationResponseDto response = new OtpVerificationResponseDto();
 
         otpCodeService.validateOtp(email, code);
 
@@ -37,36 +38,25 @@ public class AuthServiceBean implements AuthService {
             log.info("New user detected for email: {}", email);
             String registerToken = jwtService.generateRegistrationToken(email);
 
-            OtpVerificationNewUserResponseDto newUserResponse = new OtpVerificationNewUserResponseDto();
-            newUserResponse.setStatus("REGISTRATION_REQUIRED");
-            newUserResponse.setRegisterToken(registerToken);
+            response.setStatus("REGISTRATION_REQUIRED");
+            response.setRegistrationToken(registerToken);
 
-            return OtpVerificationResult.forNewUser(newUserResponse);
+            return response;
         }
 
         log.info("Existing user found for email: {}", email);
-        OtpVerificationUserResponseDto existingUserResponse = userService.getExistingUserByEmail(email);
-        UserBaseDto user = existingUserResponse.getUser();
+        response.setUser(userService.getExistingUserByEmail(email));
+        UserBaseDto user = response.getUser();
 
-        String sessionToken = null;
-        if (UserBaseDto.RoleEnum.TRAINER.equals(user.getRole())) {
-            sessionToken = jwtService.generateSessionToken(
-                    user.getId().longValue(),
-                    user.getEmail(),
-                    List.of(user.getRole().getValue())
-            );
-            log.info("Generated session token for trainer: {}", email);
-        } else {
-            deviceService.updateUserDevice(user.getId().longValue(), request.getPublicHashKey());
-            log.info("Device registered/updated for member: {}", email);
-        }
+        deviceService.updateUserDevice(user.getId().longValue(), request.getPublicHashKey());
+        log.info("Device registered/updated for member: {}", email);
 
-        return OtpVerificationResult.forExistingUser(existingUserResponse, sessionToken);
+        return response;
     }
 
     @Override
     @ReadWriteTransaction
-    public OtpVerificationUserResponseDto registerUser(RegistrationRequestDto request) {
+    public UserBaseDto registerUser(RegistrationRequestDto request) {
         String email = jwtService.extractEmailFromRegistrationToken(request.getRegistrationToken());
 
         if (userService.userExists(email)) {
@@ -82,6 +72,6 @@ public class AuthServiceBean implements AuthService {
         deviceService.updateUserDevice(newUser.getId(), request.getPublicKeyHash());
         log.info("Registered new user and device for email: {}", email);
 
-        return authMapper.toExistingUserResponse(newUser);
+        return authMapper.toUserBaseDto(newUser);
     }
 }

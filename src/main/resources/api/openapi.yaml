@@ -51,21 +51,10 @@ paths:
       responses:
         '200':
           description: OTP verified successfully
-          headers:
-            Set-Cookie:
-              description: Relation token (HTTPOnly). Returned only if the logging in user has the TRAINER role.
-              schema:
-                type: string
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OtpVerifyResponseDto'
-        '202':
-          description: OTP is valid, but user is not registered
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OtpVerifyResponseDto'
+                $ref: './components/schemas/auth/OtpVerificationResponseDto.yaml'
         '400':
             $ref: './components/responses/MessageResponseDto.yaml'
         '401':
@@ -89,7 +78,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: './components/schemas/auth/OtpVerificationUserResponseDto.yaml'
+                $ref: './components/schemas/user/UserBaseDto.yaml'
         '400':
           description: Invalid request format (e.g., missing name or public key)
           content:
@@ -110,10 +99,6 @@ paths:
                 $ref: './components/responses/MessageResponseDto.yaml'
 components:
   schemas:
-    OtpVerifyResponseDto:
-      oneOf:
-        - $ref: './components/schemas/auth/OtpVerificationUserResponseDto.yaml'
-        - $ref: './components/schemas/auth/OtpVerificationNewUserResponseDto.yaml'
     RegistrationRequestDto:
       type: object
       required:

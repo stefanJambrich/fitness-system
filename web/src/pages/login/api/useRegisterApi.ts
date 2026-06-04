@@ -1,7 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { getOrCreateDeviceKey } from "../utils/deviceKey.ts";
-import type { OtpVerificationUserResponseDto } from "./useVerifyOtpApi.ts";
+import {apiDefinitions} from "./apiDefinitions.ts";
+import type {UserBaseDto} from "../../../commons/api/schemas/UserBaseDto.ts";
 
 export interface RegisterRequest {
     registrationToken: string;
@@ -15,19 +16,21 @@ export function useRegisterApi() {
 
     const registerUser = async (
         request: RegisterRequest
-    ): Promise<OtpVerificationUserResponseDto> => {
+    ): Promise<UserBaseDto> => {
         setIsLoading(true);
         setError(null);
         try {
             const publicKeyHash = getOrCreateDeviceKey();
-            const response = await axios.post<OtpVerificationUserResponseDto>(
-                "/auth/api/v1/register",
+            const response = await axios.post<UserBaseDto>(
+                apiDefinitions.registerApi,
                 {
                     ...request,
                     publicKeyHash,
                 }
             );
-            return response.data;
+            return {
+                ...response.data,
+            };
         } catch (err: any) {
             const errorMsg = err.response?.data?.message || "Registrace se nezdařila.";
             setError(errorMsg);

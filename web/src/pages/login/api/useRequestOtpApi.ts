@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import type {MessageResponse} from "../../../commons/api/schemas/MessageResponse.ts";
+import {apiDefinitions} from "./apiDefinitions.ts";
 
 export function useRequestOtpApi() {
     const [isLoading, setIsLoading] = useState(false);
@@ -11,7 +12,7 @@ export function useRequestOtpApi() {
         setError(null);
         try {
             const response = await axios.post<MessageResponse>(
-                "/auth/api/v1/otp",
+                apiDefinitions.requestOtpApi,
                 null,
                 {
                     params: {

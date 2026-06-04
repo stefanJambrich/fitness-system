@@ -7,9 +7,6 @@ import net.unicorn.fitnesssystem.api.model.*;
 import net.unicorn.fitnesssystem.helper.MessageBuilder;
 import net.unicorn.fitnesssystem.service.AuthService;
 import net.unicorn.fitnesssystem.service.OtpCodeService;
-import net.unicorn.fitnesssystem.service.OtpVerificationResult;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,30 +27,13 @@ public class AuthApiController implements AuthApi {
     }
 
     @Override
-    public ResponseEntity<OtpVerifyResponseDto> verifyOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
-        OtpVerificationResult result = authService.verifyOtp(otpVerificationRequestDto);
-
-        if (result.isNewUser()) {
-            return ResponseEntity.accepted().body(result.newUserResponse());
-        }
-
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok();
-        if (result.sessionToken() != null) {
-            ResponseCookie cookie = ResponseCookie.from("session_token", result.sessionToken())
-                    .httpOnly(true)
-                    .secure(true)
-                    .sameSite("Strict")
-                    .path("/")
-                    .maxAge(14400)
-                    .build();
-            responseBuilder.header(HttpHeaders.SET_COOKIE, cookie.toString());
-        }
-
-        return responseBuilder.body(result.existingUserResponse());
+    public ResponseEntity<OtpVerificationResponseDto> verifyOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
+        OtpVerificationResponseDto result = authService.verifyOtp(otpVerificationRequestDto);
+        return ResponseEntity.ok().body(result);
     }
 
     @Override
-    public ResponseEntity<OtpVerificationUserResponseDto> registerUser(RegistrationRequestDto registrationRequestDto) {
+    public ResponseEntity<UserBaseDto> registerUser(RegistrationRequestDto registrationRequestDto) {
         var response = authService.registerUser(registrationRequestDto);
         return ResponseEntity.ok(response);
     }

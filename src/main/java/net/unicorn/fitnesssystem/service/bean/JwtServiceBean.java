@@ -28,9 +28,6 @@ public class JwtServiceBean implements JwtService {
     @Value("${application.security.jwt.registration-expiration}")
     private long registrationExpiration;
 
-    @Value("${application.security.jwt.session-expiration}")
-    private long sessionExpiration;
-
     @Override
     public String generateRegistrationToken(String email) {
         Date now = new Date();
@@ -42,22 +39,6 @@ public class JwtServiceBean implements JwtService {
                 .expiration(expiryDate)
                 .signWith(getSecretKey())
                 .claim("type", "registration_token")
-                .compact();
-    }
-
-    @Override
-    public String generateSessionToken(Long userId, String email, List<String> roles) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + sessionExpiration);
-
-        return Jwts.builder()
-                .subject(String.valueOf(userId))
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .claim("type", "session_token")
-                .claim("email", email)
-                .claim("roles", roles)
-                .signWith(getSecretKey())
                 .compact();
     }
 

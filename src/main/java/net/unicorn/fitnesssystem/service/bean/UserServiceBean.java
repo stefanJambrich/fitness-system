@@ -4,7 +4,7 @@ import lombok.CustomLog;
 import lombok.RequiredArgsConstructor;
 import net.unicorn.fitnesssystem.annotations.ReadOnlyTransaction;
 import net.unicorn.fitnesssystem.annotations.ReadWriteTransaction;
-import net.unicorn.fitnesssystem.api.model.OtpVerificationUserResponseDto;
+import net.unicorn.fitnesssystem.api.model.UserBaseDto;
 import net.unicorn.fitnesssystem.entity.Role;
 import net.unicorn.fitnesssystem.entity.User;
 import net.unicorn.fitnesssystem.exceptions.ApplicationException;
@@ -37,11 +37,11 @@ public class UserServiceBean implements UserService {
     }
 
     @Override
-    public OtpVerificationUserResponseDto getExistingUserByEmail(String email) {
+    public UserBaseDto getExistingUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException("User not found for email: " + email));
 
-        return authMapper.toExistingUserResponse(user);
+        return authMapper.toUserBaseDto(user);
     }
 
     @Override
@@ -62,6 +62,7 @@ public class UserServiceBean implements UserService {
     }
 
     private String generateUniqueUserCode(String fullname) {
+        log.info("Generating unique code for user with fullname: {}", fullname);
         String baseName = fullname.replaceAll("\\s+", "");
 
         if (baseName.length() > 10) {
@@ -87,6 +88,7 @@ public class UserServiceBean implements UserService {
             generatedCode = baseName + "#" + UUID.randomUUID().toString().substring(0, 6);
         }
 
+        log.info("Finished generating unique code for user");
         return generatedCode;
     }
 }

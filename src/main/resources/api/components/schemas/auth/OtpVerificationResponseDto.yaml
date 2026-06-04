@@ -1,12 +1,11 @@
 title: OtpVerificationNewUserResponseDto
 type: object
-required:
-  - status
-  - register_token
 properties:
+  user:
+    $ref: '../user/UserBaseDto.yaml'
   status:
     type: string
     example: REGISTRATION_REQUIRED
-  register_token:
+  registrationToken:
     type: string
     example: "eyJhbGciOi..."

@@ -2,18 +2,13 @@ import { useState } from "react";
 import axios from "axios";
 import { getOrCreateDeviceKey } from "../utils/deviceKey.ts";
 import type { UserBaseDto } from "../../../commons/api/schemas/UserBaseDto.ts";
+import {apiDefinitions} from "./apiDefinitions.ts";
 
-export interface OtpVerificationUserResponseDto {
+export interface OtpVerificationResponseDto {
     user: UserBaseDto;
-    authMethod: "DEVICE_KEY" | "SESSION_COOKIE";
-}
-
-export interface OtpVerificationNewUserResponseDto {
     status: "REGISTRATION_REQUIRED";
-    registerToken: string;
+    registrationToken: string;
 }
-
-export type VerifyResponse = OtpVerificationUserResponseDto | OtpVerificationNewUserResponseDto;
 
 export function useVerifyOtpApi() {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,13 +17,13 @@ export function useVerifyOtpApi() {
     const verifyOtp = async (
         email: string,
         code: string
-    ): Promise<{ data: VerifyResponse; status: number }> => {
+    ): Promise<{ data: OtpVerificationResponseDto; status: number }> => {
         setIsLoading(true);
         setError(null);
         try {
             const publicHashKey = getOrCreateDeviceKey();
-            const response = await axios.post<VerifyResponse>(
-                "/auth/api/v1/otp/verify",
+            const response = await axios.post<OtpVerificationResponseDto>(
+                apiDefinitions.verifyApi,
                 {
                     email: email.trim().toLowerCase(),
                     code: code.trim(),

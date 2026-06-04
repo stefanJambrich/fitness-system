@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useEmailStep } from "./useEmailStep.ts";
 import { useOtpStep } from "./useOtpStep.ts";
 import { useNicknameStep } from "./useNicknameStep.ts";
-import type { VerifyResponse } from "../api/useVerifyOtpApi.ts";
+import type {OtpVerificationResponseDto} from "../api/useVerifyOtpApi.ts";
 
 export type LoginStep = "email" | "otp" | "nickname";
 
@@ -32,15 +32,15 @@ export function useLoginFlow() {
         email: emailStep.stepProps.email,
         onBack: handleBackToEmail,
         clearErrors: clearAllErrors,
-        onSuccess: (data: VerifyResponse, status: number) => {
+        onSuccess: (data: OtpVerificationResponseDto, status: number) => {
             if (status === 202) {
-                const newData = data as any;
-                setRegisterToken(newData.register_token || newData.registerToken || "");
+                const newData = data as OtpVerificationResponseDto;
+                setRegisterToken(newData.registrationToken);
                 setStep("nickname");
             } else {
-                const successData = data as any;
+                //TODO: Rework this so that its not storing the user info into localStorage
+                const successData = data as OtpVerificationUserResponseDto;
                 localStorage.setItem("fitreserve_user", JSON.stringify(successData.user));
-                localStorage.setItem("fitreserve_auth_method", successData.auth_method);
                 navigate("/");
             }
         },
