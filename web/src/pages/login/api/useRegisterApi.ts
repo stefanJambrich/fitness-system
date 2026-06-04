@@ -1,8 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { getOrCreateDeviceKey } from "../utils/deviceKey.ts";
-import {apiDefinitions} from "./apiDefinitions.ts";
-import type {UserBaseDto} from "../../../commons/api/schemas/UserBaseDto.ts";
+import { apiDefinitions } from "./apiDefinitions.ts";
+import type { UserBaseDto } from "../../../commons/api/schemas/UserBaseDto.ts";
 
 export interface RegisterRequest {
     registrationToken: string;
@@ -28,9 +28,7 @@ export function useRegisterApi() {
                     publicKeyHash,
                 }
             );
-            return {
-                ...response.data,
-            };
+            return response.data;
         } catch (err: any) {
             const errorMsg = err.response?.data?.message || "Registrace se nezdařila.";
             setError(errorMsg);

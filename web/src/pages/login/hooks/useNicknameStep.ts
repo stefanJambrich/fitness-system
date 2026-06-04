@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useRegisterApi } from "../api/useRegisterApi.ts";
+import { useAppDispatch } from "../../../store/hooks.ts";
+import { setUserInfo } from "../../../store/userSlice.ts";
 
 interface UseNicknameStepProps {
     registerToken: string;
@@ -10,6 +12,7 @@ export function useNicknameStep({ registerToken, onSuccess }: UseNicknameStepPro
     const [nickname, setNickname] = useState("");
     const [registerAsTrainer, setRegisterAsTrainer] = useState(false);
     const { registerUser, isLoading, error, setError } = useRegisterApi();
+    const dispatch = useAppDispatch();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,8 +22,7 @@ export function useNicknameStep({ registerToken, onSuccess }: UseNicknameStepPro
                 name: nickname.trim(),
                 registerAsTrainer,
             });
-            localStorage.setItem("fitreserve_user", JSON.stringify(res.user));
-            localStorage.setItem("fitreserve_auth_method", res.authMethod);
+            dispatch(setUserInfo({ user: res }));
             onSuccess();
         }
     };

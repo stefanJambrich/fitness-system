@@ -3,12 +3,15 @@ import { useNavigate } from "react-router";
 import { useEmailStep } from "./useEmailStep.ts";
 import { useOtpStep } from "./useOtpStep.ts";
 import { useNicknameStep } from "./useNicknameStep.ts";
-import type {OtpVerificationResponseDto} from "../api/useVerifyOtpApi.ts";
+import type { OtpVerificationResponseDto } from "../api/useVerifyOtpApi.ts";
+import { useAppDispatch } from "../../../store/hooks.ts";
+import { setUser } from "../../../store/userSlice.ts";
 
 export type LoginStep = "email" | "otp" | "nickname";
 
 export function useLoginFlow() {
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const [step, setStep] = useState<LoginStep>("email");
     const [registerToken, setRegisterToken] = useState<string>("");
 
@@ -32,15 +35,13 @@ export function useLoginFlow() {
         email: emailStep.stepProps.email,
         onBack: handleBackToEmail,
         clearErrors: clearAllErrors,
-        onSuccess: (data: OtpVerificationResponseDto, status: number) => {
-            if (status === 202) {
+        onSuccess: (data: OtpVerificationResponseDto) => {
+            if (data.status == "REGISTRATION_REQUIRED") {
                 const newData = data as OtpVerificationResponseDto;
                 setRegisterToken(newData.registrationToken);
                 setStep("nickname");
             } else {
-                //TODO: Rework this so that its not storing the user info into localStorage
-                const successData = data as OtpVerificationUserResponseDto;
-                localStorage.setItem("fitreserve_user", JSON.stringify(successData.user));
+                dispatch(setUser(data.user));
                 navigate("/");
             }
         },
