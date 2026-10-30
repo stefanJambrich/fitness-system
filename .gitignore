@@ -34,4 +34,9 @@ build/
 .vscode/
 
 docs/
-node_modules/
+
+# frontend
+frontend/node_modules/
+frontend/dist/
+frontend/src/api/generated/
+frontend/.env*.local
