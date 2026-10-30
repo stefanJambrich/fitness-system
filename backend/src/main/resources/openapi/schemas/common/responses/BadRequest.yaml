@@ -1,0 +1,5 @@
+description: VALIDATION (with field list)
+content:
+  application/json:
+    schema:
+      $ref: '../ErrorResponse.yaml'

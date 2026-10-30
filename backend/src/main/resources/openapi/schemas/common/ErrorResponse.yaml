@@ -1,0 +1,12 @@
+type: object
+required: [error, message]
+properties:
+  error:
+    type: string
+    example: VALIDATION
+  message:
+    type: string
+  fields:
+    type: object
+    additionalProperties:
+      type: string

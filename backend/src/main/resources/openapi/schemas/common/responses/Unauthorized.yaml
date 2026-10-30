@@ -1,0 +1,5 @@
+description: AUTH_INVALID, DEVICE_UNKNOWN, DEVICE_REVOKED, MEMBER_DELETED, CLOCK_SKEW, REPLAY, SESSION_EXPIRED, OTP_INVALID, OTP_EXPIRED, OTP_LOCKED
+content:
+  application/json:
+    schema:
+      $ref: '../ErrorResponse.yaml'

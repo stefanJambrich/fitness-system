@@ -1,0 +1,5 @@
+description: NO_CREDIT, TRAINING_FULL, ALREADY_BOOKED, TRAINING_NOT_OPEN, CANCEL_DEADLINE_PASSED, CAPACITY_BELOW_TAKEN, ALREADY_RESOLVED, LAST_DEVICE, PAIRING_INVALID
+content:
+  application/json:
+    schema:
+      $ref: '../ErrorResponse.yaml'

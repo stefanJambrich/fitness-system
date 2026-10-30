@@ -1,0 +1,5 @@
+description: NOT_MEMBER, NOT_GROUP_TRAINER, OWNER_ONLY, FORBIDDEN
+content:
+  application/json:
+    schema:
+      $ref: '../ErrorResponse.yaml'

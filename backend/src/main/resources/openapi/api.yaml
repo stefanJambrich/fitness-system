@@ -15,6 +15,7 @@ paths:
       tags: [health]
       operationId: ping
       summary: Returns a pong with the server time
+      security: []
       parameters:
         - name: name
           in: query
@@ -31,7 +32,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PingResponse'
         '400':
-          $ref: '#/components/responses/BadRequest'
+          $ref: './schemas/common/responses/BadRequest.yaml'
 
 components:
   schemas:
@@ -47,23 +48,18 @@ components:
           format: date-time
 
     ErrorResponse:
-      type: object
-      required: [error, message]
-      properties:
-        error:
-          type: string
-          example: VALIDATION
-        message:
-          type: string
-        fields:
-          type: object
-          additionalProperties:
-            type: string
+      $ref: './schemas/common/ErrorResponse.yaml'
 
-  responses:
-    BadRequest:
-      description: Validation failed
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+  securitySchemes:
+    memberSignature:
+      type: apiKey
+      in: header
+      name: X-Signature
+      description: >
+        BR-01 signed request. Also requires X-Key-Id, X-Timestamp and X-Nonce.
+        Canonical string: METHOD\n/path?query\nX-Timestamp\nX-Nonce\nbase64url(SHA-256(body)).
+    trainerSession:
+      type: apiKey
+      in: cookie
+      name: TRAINER_SESSION
+      description: BR-02 opaque session token (HttpOnly; Secure; SameSite=Strict).

@@ -4,7 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "gen:api": "openapi-generator-cli generate -g typescript-fetch -i ../backend/src/main/resources/openapi/api.yaml -o src/api/generated --additional-properties=supportsES6=true,useSingleRequestParameter=true,withInterfaces=true",
+    "predev": "npm run gen:api",
     "dev": "vite",
+    "prebuild": "npm run gen:api",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

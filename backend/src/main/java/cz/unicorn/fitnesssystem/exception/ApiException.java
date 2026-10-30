@@ -2,7 +2,6 @@ package cz.unicorn.fitnesssystem.exception;
 
 import org.springframework.http.HttpStatus;
 
-/** Business error rendered as {@code { "error": code, "message": message }} (section 1.4). */
 public class ApiException extends RuntimeException {
 
     private final HttpStatus status;
