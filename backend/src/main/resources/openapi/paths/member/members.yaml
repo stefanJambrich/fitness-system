@@ -1,0 +1,51 @@
+post:
+  tags: [members]
+  operationId: createMember
+  summary: UC-01 Create identity on first open
+  description: >
+    Registers a new member with its first device. The request is signed (BR-01) with the
+    new key, and the server verifies the signature against `publicKey` from the body,
+    which proves the client holds the private key.
+  security:
+    - memberSignature: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [nickname, publicKey, algorithm]
+          properties:
+            nickname:
+              type: string
+              minLength: 1
+              maxLength: 32
+              pattern: '^[^#\p{Cc}]+$'
+              description: Trimmed by the server; no control characters, no '#'.
+            publicKey:
+              type: string
+              minLength: 1
+              maxLength: 512
+              pattern: '^[A-Za-z0-9_-]+$'
+              description: SPKI-encoded public key, base64url without padding.
+            algorithm:
+              $ref: '../../schemas/member/KeyAlgorithm.yaml'
+            deviceLabel:
+              type: string
+              maxLength: 64
+              example: Firefox on Linux
+  responses:
+    '201':
+      description: Member created
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/member/MemberIdentity.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '409':
+      $ref: '../../schemas/common/responses/Conflict.yaml'
+    '429':
+      $ref: '../../schemas/common/responses/TooManyRequests.yaml'

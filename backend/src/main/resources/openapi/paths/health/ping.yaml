@@ -1,0 +1,22 @@
+get:
+  tags: [health]
+  operationId: ping
+  summary: Returns a pong with the server time
+  security: []
+  parameters:
+    - name: name
+      in: query
+      required: false
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 32
+  responses:
+    '200':
+      description: Pong
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/health/PingResponse.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'

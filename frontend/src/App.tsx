@@ -1,26 +1,23 @@
 import { useEffect, useState } from 'react'
-import { healthApi } from './api/client'
+import type { MemberIdentity } from './api/generated'
+import { loadProfile } from './crypto/keyStore'
+import { FirstRunScreen } from './member/FirstRunScreen'
+import { HomeScreen } from './member/HomeScreen'
 import { strings } from './shared/strings'
 
-type BackendState = 'checking' | 'ok' | 'down'
-
 function App() {
-  const [backend, setBackend] = useState<BackendState>('checking')
+  const [profile, setProfile] = useState<MemberIdentity | null>()
 
   useEffect(() => {
-    healthApi.ping({})
-      .then(() => setBackend('ok'))
-      .catch(() => setBackend('down'))
+    loadProfile().then((stored) => setProfile(stored ?? null))
   }, [])
 
   return (
     <main>
       <h1>{strings.appName}</h1>
-      <p>
-        {backend === 'checking' && strings.backendChecking}
-        {backend === 'ok' && strings.backendOk}
-        {backend === 'down' && strings.backendDown}
-      </p>
+      {profile === undefined && <p>{strings.loading}</p>}
+      {profile === null && <FirstRunScreen onCreated={setProfile} />}
+      {profile && <HomeScreen profile={profile} />}
     </main>
   )
 }

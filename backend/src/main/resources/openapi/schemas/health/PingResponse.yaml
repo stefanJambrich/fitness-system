@@ -1,0 +1,9 @@
+type: object
+required: [message, serverTime]
+properties:
+  message:
+    type: string
+    example: pong
+  serverTime:
+    type: string
+    format: date-time

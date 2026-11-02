@@ -1,0 +1,13 @@
+type: object
+description: The client shows the public identifier as nickname#code (e.g. Karel#K7Q2).
+required: [memberId, nickname, code]
+properties:
+  memberId:
+    type: string
+    format: uuid
+  nickname:
+    type: string
+    example: Karel
+  code:
+    type: string
+    example: K7Q2
