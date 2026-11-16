@@ -10,9 +10,11 @@ export function formatIdentifier(member: Pick<MemberIdentity, 'nickname' | 'code
   return `${member.nickname}#${member.code}`
 }
 
+const UNUSABLE_KEY_ERRORS = ['DEVICE_UNKNOWN', 'DEVICE_REVOKED', 'MEMBER_DELETED']
+
 /**
- * UC-01: registers this device as a new member. A key left over from a failed attempt is reused;
- * if the server already knows it, a fresh key is generated once.
+ * Registers this device as a new member. A key left over from a failed attempt is reused; if the server
+ * already registered it (the response got lost), that identity is recovered instead of creating a second one.
  */
 export async function createIdentity(nickname: string): Promise<MemberIdentity> {
   try {
@@ -21,8 +23,27 @@ export async function createIdentity(nickname: string): Promise<MemberIdentity> 
     if ((await apiErrorCode(error)) !== 'KEY_ALREADY_REGISTERED') {
       throw error
     }
-    await deleteKeyPair()
-    return register(nickname)
+  }
+  const recovered = await recoverProfile()
+  if (recovered) {
+    return recovered
+  }
+  await deleteKeyPair()
+  return register(nickname)
+}
+
+/** Profile of the already registered key, or undefined when the server no longer accepts that key. */
+async function recoverProfile(): Promise<MemberIdentity | undefined> {
+  try {
+    const { memberId, nickname, code } = await membersApi.getMyProfile()
+    const profile = { memberId, nickname, code }
+    await saveProfile(profile)
+    return profile
+  } catch (error) {
+    if (UNUSABLE_KEY_ERRORS.includes((await apiErrorCode(error)) ?? '')) {
+      return undefined
+    }
+    throw error
   }
 }
 

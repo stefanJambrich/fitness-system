@@ -1,8 +1,10 @@
 package cz.unicorn.fitnesssystem.exception;
 
 import java.util.Map;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public class ApiException extends RuntimeException {
 
     private final HttpStatus status;
@@ -22,17 +24,5 @@ public class ApiException extends RuntimeException {
 
     public static ApiException validation(String field, String problem) {
         return new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION", "Request validation failed", Map.of(field, problem));
-    }
-
-    public HttpStatus getStatus() {
-        return status;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public Map<String, String> getFields() {
-        return fields;
     }
 }

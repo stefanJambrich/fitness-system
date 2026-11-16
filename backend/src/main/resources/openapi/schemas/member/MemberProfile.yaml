@@ -1,0 +1,22 @@
+type: object
+description: Profile of the signed-in member.
+required: [memberId, nickname, code, deviceCount]
+properties:
+  memberId:
+    type: string
+    format: uuid
+  nickname:
+    type: string
+    example: Karel
+  code:
+    type: string
+    example: K7Q2
+  recoveryEmail:
+    type: string
+    nullable: true
+    description: Masked recovery e-mail, null when none is linked.
+    example: k***@example.com
+  deviceCount:
+    type: integer
+    description: Number of active (not revoked) devices.
+    example: 1

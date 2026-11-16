@@ -9,13 +9,15 @@ tags:
   - name: health
     description: Smoke test of the contract-first pipeline
   - name: members
-    description: Member identity and devices (UC-01..09)
+    description: Member identity and devices
 
 paths:
   /ping:
     $ref: './paths/health/ping.yaml'
   /members:
     $ref: './paths/member/members.yaml'
+  /me:
+    $ref: './paths/member/me.yaml'
 
 components:
   schemas:
@@ -27,6 +29,10 @@ components:
       $ref: './schemas/member/KeyAlgorithm.yaml'
     MemberIdentity:
       $ref: './schemas/member/MemberIdentity.yaml'
+    MemberProfile:
+      $ref: './schemas/member/MemberProfile.yaml'
+    Nickname:
+      $ref: './schemas/member/Nickname.yaml'
 
   securitySchemes:
     memberSignature:
@@ -34,10 +40,10 @@ components:
       in: header
       name: X-Signature
       description: >
-        BR-01 signed request. Also requires X-Key-Id, X-Timestamp and X-Nonce.
+        Signed request. Also requires X-Key-Id, X-Timestamp and X-Nonce.
         Canonical string: METHOD\n/path?query\nX-Timestamp\nX-Nonce\nbase64url(SHA-256(body)).
     trainerSession:
       type: apiKey
       in: cookie
       name: TRAINER_SESSION
-      description: BR-02 opaque session token (HttpOnly; Secure; SameSite=Strict).
+      description: Opaque session token (HttpOnly; Secure; SameSite=Strict).

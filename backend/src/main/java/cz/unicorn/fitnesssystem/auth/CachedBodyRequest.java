@@ -1,5 +1,6 @@
 package cz.unicorn.fitnesssystem.auth;
 
+import cz.unicorn.fitnesssystem.exception.ApiException;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,19 +11,22 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
+import org.springframework.util.unit.DataSize;
 
-/**
- * Reads the whole body up front so the signature filter can hash it before the controller
- * consumes it ({@code ContentCachingRequestWrapper} only caches after the body is read).
- */
 public class CachedBodyRequest extends HttpServletRequestWrapper {
 
     @Getter
     private final byte[] body;
 
-    public CachedBodyRequest(HttpServletRequest request) throws IOException {
+    public CachedBodyRequest(HttpServletRequest request, DataSize maxBodySize) throws IOException {
         super(request);
-        this.body = request.getInputStream().readAllBytes();
+        int limit = Math.toIntExact(maxBodySize.toBytes());
+        byte[] bytes = request.getInputStream().readNBytes(limit + 1);
+        if (bytes.length > limit) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "VALIDATION", "Request body is too large");
+        }
+        this.body = bytes;
     }
 
     @Override

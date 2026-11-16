@@ -1,0 +1,44 @@
+get:
+  tags: [members]
+  operationId: getMyProfile
+  summary: Show my identifier and QR
+  description: Returns the profile of the member who signed the request.
+  security:
+    - memberSignature: []
+  responses:
+    '200':
+      description: Member profile
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/member/MemberProfile.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+patch:
+  tags: [members]
+  operationId: changeNickname
+  summary: Change nickname
+  description: Changes the nickname.
+  security:
+    - memberSignature: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [nickname]
+          properties:
+            nickname:
+              $ref: '../../schemas/member/Nickname.yaml'
+  responses:
+    '200':
+      description: The member's new identifier
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/member/MemberIdentity.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'

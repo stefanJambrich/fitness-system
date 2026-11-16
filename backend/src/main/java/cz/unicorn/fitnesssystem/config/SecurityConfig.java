@@ -1,7 +1,8 @@
 package cz.unicorn.fitnesssystem.config;
 
 import cz.unicorn.fitnesssystem.auth.SignatureAuthFilter;
-import java.time.Clock;
+import cz.unicorn.fitnesssystem.auth.SignatureVerifier;
+import cz.unicorn.fitnesssystem.service.MemberAuthService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, Clock clock, AppProperties properties)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, MemberAuthService memberAuthService,
+                                                   SignatureVerifier signatureVerifier, AppProperties properties)
             throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -33,11 +35,12 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex))
                         .accessDeniedHandler((req, res, ex) -> exceptionResolver.resolveException(req, res, null, ex)))
-                .addFilterBefore(new SignatureAuthFilter(clock, properties.signature(), exceptionResolver),
+                .addFilterBefore(new SignatureAuthFilter(memberAuthService, signatureVerifier, exceptionResolver, properties),
                         AnonymousAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/ping").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/members").permitAll()
+                        .requestMatchers("/api/me", "/api/me/**").hasRole("MEMBER")
                         .anyRequest().denyAll());
         return http.build();
     }

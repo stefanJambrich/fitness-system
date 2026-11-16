@@ -1,5 +1,6 @@
 package cz.unicorn.fitnesssystem.auth;
 
+import cz.unicorn.fitnesssystem.config.AppProperties;
 import cz.unicorn.fitnesssystem.dto.SignedRequest;
 import cz.unicorn.fitnesssystem.exception.ApiException;
 import java.nio.charset.StandardCharsets;
@@ -13,13 +14,26 @@ import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECGenParameterSpec;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.Clock;
+import java.time.Duration;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class SignatureVerifier {
 
     private static final ECParameterSpec P256 = p256();
+
+    private final Clock clock;
+    private final AppProperties properties;
+
+    public void checkClockSkew(SignedRequest request) {
+        if (Duration.between(request.timestamp(), clock.instant()).abs().compareTo(properties.signature().maxClockSkew()) > 0) {
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "CLOCK_SKEW", "Request timestamp is too far from server time");
+        }
+    }
 
     /** Parses an SPKI public key
      *  throws {@link IllegalArgumentException} unless it is on curve P-256.

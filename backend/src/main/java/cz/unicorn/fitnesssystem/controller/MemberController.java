@@ -1,8 +1,11 @@
 package cz.unicorn.fitnesssystem.controller;
 
 import cz.unicorn.fitnesssystem.api.MembersApi;
+import cz.unicorn.fitnesssystem.api.model.ChangeNicknameRequest;
 import cz.unicorn.fitnesssystem.api.model.CreateMemberRequest;
 import cz.unicorn.fitnesssystem.api.model.MemberIdentity;
+import cz.unicorn.fitnesssystem.api.model.MemberProfile;
+import cz.unicorn.fitnesssystem.auth.CurrentMember;
 import cz.unicorn.fitnesssystem.config.AppProperties;
 import cz.unicorn.fitnesssystem.dto.SignedRequest;
 import cz.unicorn.fitnesssystem.entity.Member;
@@ -21,6 +24,7 @@ public class MemberController implements MembersApi {
 
     private final MemberService memberService;
     private final MemberMapper memberMapper;
+    private final CurrentMember currentMember;
     private final RateLimiter rateLimiter;
     private final AppProperties properties;
     private final HttpServletRequest request;
@@ -37,5 +41,16 @@ public class MemberController implements MembersApi {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(memberMapper.toMemberIdentity(member));
+    }
+
+    @Override
+    public ResponseEntity<MemberProfile> getMyProfile() {
+        return ResponseEntity.ok(memberMapper.toMemberProfile(memberService.getProfile(currentMember.get().memberId())));
+    }
+
+    @Override
+    public ResponseEntity<MemberIdentity> changeNickname(ChangeNicknameRequest changeNicknameRequest) {
+        Member member = memberService.changeNickname(currentMember.get().memberId(), changeNicknameRequest.getNickname());
+        return ResponseEntity.ok(memberMapper.toMemberIdentity(member));
     }
 }

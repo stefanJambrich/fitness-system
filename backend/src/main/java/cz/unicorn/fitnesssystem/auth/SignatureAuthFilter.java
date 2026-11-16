@@ -1,25 +1,32 @@
 package cz.unicorn.fitnesssystem.auth;
 
 import cz.unicorn.fitnesssystem.config.AppProperties;
+import cz.unicorn.fitnesssystem.dto.MemberPrincipal;
 import cz.unicorn.fitnesssystem.dto.SignedRequest;
 import cz.unicorn.fitnesssystem.exception.ApiException;
+import cz.unicorn.fitnesssystem.service.MemberAuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
- * Parses the BR-01 headers, checks clock skew and exposes a {@link SignedRequest} attribute.
+ * Authenticates every {@code /api/me} request. Registration has no device to look up yet,
+ * so it only gets a clock-skew check and the parsed {@link SignedRequest} as a request attribute.
  */
 @RequiredArgsConstructor
 public class SignatureAuthFilter extends OncePerRequestFilter {
@@ -33,26 +40,52 @@ public class SignatureAuthFilter extends OncePerRequestFilter {
     private static final int NONCE_BYTES = 16;
     private static final int SIGNATURE_BYTES = 64;
 
-    private final Clock clock;
-    private final AppProperties.Signature properties;
+    private static final String MEMBER_API = "/api/me";
+    private static final List<GrantedAuthority> MEMBER_AUTHORITIES = AuthorityUtils.createAuthorityList("ROLE_MEMBER");
+
+    private final MemberAuthService memberAuthService;
+    private final SignatureVerifier signatureVerifier;
     private final HandlerExceptionResolver exceptionResolver;
+    private final AppProperties properties;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return !(HttpMethod.POST.matches(request.getMethod()) && "/api/members".equals(request.getRequestURI()));
+        return !isRegistration(request) && !isMemberApi(request);
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        CachedBodyRequest cached = new CachedBodyRequest(request);
+        CachedBodyRequest cached;
         try {
-            cached.setAttribute(SignedRequest.ATTRIBUTE, parse(cached));
-        } catch (ApiException e) {
+            cached = new CachedBodyRequest(request, properties.signature().maxBodySize());
+            SignedRequest signed = parse(cached);
+            if (isRegistration(cached)) {
+                signatureVerifier.checkClockSkew(signed);
+                cached.setAttribute(SignedRequest.ATTRIBUTE, signed);
+            } else {
+                signIn(memberAuthService.authenticate(signed));
+            }
+        } catch (RuntimeException e) {
             exceptionResolver.resolveException(request, response, null, e);
             return;
         }
         chain.doFilter(cached, response);
+    }
+
+    private static boolean isRegistration(HttpServletRequest request) {
+        return HttpMethod.POST.matches(request.getMethod()) && "/api/members".equals(request.getRequestURI());
+    }
+
+    private static boolean isMemberApi(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.equals(MEMBER_API) || uri.startsWith(MEMBER_API + "/");
+    }
+
+    private static void signIn(MemberPrincipal principal) {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(UsernamePasswordAuthenticationToken.authenticated(principal, null, MEMBER_AUTHORITIES));
+        SecurityContextHolder.setContext(context);
     }
 
     private SignedRequest parse(CachedBodyRequest request) {
@@ -69,9 +102,6 @@ public class SignatureAuthFilter extends OncePerRequestFilter {
             signedAt = Instant.parse(timestamp);
         } catch (DateTimeParseException e) {
             throw invalid("Malformed " + TIMESTAMP);
-        }
-        if (Duration.between(signedAt, clock.instant()).abs().compareTo(properties.maxClockSkew()) > 0) {
-            throw new ApiException(HttpStatus.UNAUTHORIZED, "CLOCK_SKEW", "Request timestamp is too far from server time");
         }
 
         String pathAndQuery = request.getQueryString() == null

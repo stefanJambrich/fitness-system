@@ -1,11 +1,10 @@
 post:
   tags: [members]
   operationId: createMember
-  summary: UC-01 Create identity on first open
+  summary: Create identity on first open
   description: >
-    Registers a new member with its first device. The request is signed (BR-01) with the
-    new key, and the server verifies the signature against `publicKey` from the body,
-    which proves the client holds the private key.
+    Registers a new member with its first device. The request must be signed by the key in
+    `publicKey`, which proves the client holds the private key.
   security:
     - memberSignature: []
   requestBody:
@@ -17,11 +16,7 @@ post:
           required: [nickname, publicKey, algorithm]
           properties:
             nickname:
-              type: string
-              minLength: 1
-              maxLength: 32
-              pattern: '^[^#\p{Cc}]+$'
-              description: Trimmed by the server; no control characters, no '#'.
+              $ref: '../../schemas/member/Nickname.yaml'
             publicKey:
               type: string
               minLength: 1
