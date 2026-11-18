@@ -1,0 +1,5 @@
+type: string
+minLength: 1
+maxLength: 64
+description: IANA time zone name. Trainings are shown and series are generated in it.
+example: Europe/Prague

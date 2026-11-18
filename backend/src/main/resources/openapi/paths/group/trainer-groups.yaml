@@ -1,0 +1,54 @@
+get:
+  tags: [groups]
+  operationId: listTrainerGroups
+  summary: List my groups
+  description: Groups I own or co-train, without deleted ones, ordered by name.
+  security:
+    - trainerSession: []
+  responses:
+    '200':
+      description: My groups
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../schemas/group/TrainerGroup.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+post:
+  tags: [groups]
+  operationId: createGroup
+  summary: Create a group
+  description: >
+    Creates the group with a new invite code and makes me its owner.
+    Without a time zone or cancel hours, the server defaults are used.
+  security:
+    - trainerSession: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [name]
+          properties:
+            name:
+              $ref: '../../schemas/group/GroupName.yaml'
+            description:
+              $ref: '../../schemas/group/GroupDescription.yaml'
+            timezone:
+              $ref: '../../schemas/group/Timezone.yaml'
+            defaultCancelHours:
+              $ref: '../../schemas/group/CancelHours.yaml'
+  responses:
+    '201':
+      description: Group created
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/TrainerGroup.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'

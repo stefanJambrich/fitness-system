@@ -1,0 +1,7 @@
+type: integer
+minimum: 0
+maximum: 720
+description: >
+  Members can cancel a booking until this many hours before the training starts (0 = until the start).
+  Applies to trainings created afterwards.
+example: 0

@@ -11,6 +11,7 @@ public record AppProperties(
         @DefaultValue Member member,
         Otp otp,
         @DefaultValue TrainerSession trainerSession,
+        @DefaultValue Group group,
         Mail mail) {
 
     public record Signature(
@@ -40,6 +41,12 @@ public record AppProperties(
             @DefaultValue("12h") Duration lifetime,
             @DefaultValue("90d") Duration rememberedLifetime,
             @DefaultValue("1m") Duration lastUsedInterval) {
+    }
+
+    public record Group(
+            @DefaultValue("8") int inviteCodeLength,
+            @DefaultValue("Europe/Prague") String defaultTimezone,
+            @DefaultValue("0") short defaultCancelHours) {
     }
 
     public record Mail(String from) {

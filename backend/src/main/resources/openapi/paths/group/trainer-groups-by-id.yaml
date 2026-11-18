@@ -1,0 +1,64 @@
+parameters:
+  - name: groupId
+    in: path
+    required: true
+    schema:
+      type: string
+      format: uuid
+patch:
+  tags: [groups]
+  operationId: updateGroup
+  summary: Edit a group
+  description: >
+    Changes only the fields that are sent; an empty description removes it.
+    A new cancel-hours value applies to trainings created afterwards.
+  security:
+    - trainerSession: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              $ref: '../../schemas/group/GroupName.yaml'
+            description:
+              $ref: '../../schemas/group/GroupDescription.yaml'
+            timezone:
+              $ref: '../../schemas/group/Timezone.yaml'
+            defaultCancelHours:
+              $ref: '../../schemas/group/CancelHours.yaml'
+  responses:
+    '200':
+      description: Group updated
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/TrainerGroup.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'
+delete:
+  tags: [groups]
+  operationId: deleteGroup
+  summary: Delete a group
+  description: >
+    Owner only. The group is hidden from trainers, its future trainings are cancelled together with their
+    bookings and its series end. Members keep seeing it under former groups with their balance.
+  security:
+    - trainerSession: []
+  responses:
+    '204':
+      description: Group deleted
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'

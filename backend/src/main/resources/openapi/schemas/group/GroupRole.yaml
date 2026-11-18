@@ -1,0 +1,3 @@
+type: string
+enum: [owner, co_trainer]
+description: The trainer's role in a group; some actions are owner-only.

@@ -12,6 +12,8 @@ tags:
     description: Member identity and devices
   - name: trainer-auth
     description: Trainer registration, login and sessions
+  - name: groups
+    description: Training groups, managed by their trainers
 
 paths:
   /ping:
@@ -34,6 +36,10 @@ paths:
     $ref: './paths/trainer/trainer-sessions.yaml'
   /trainer/sessions/{sessionId}:
     $ref: './paths/trainer/trainer-sessions-by-id.yaml'
+  /trainer/groups:
+    $ref: './paths/group/trainer-groups.yaml'
+  /trainer/groups/{groupId}:
+    $ref: './paths/group/trainer-groups-by-id.yaml'
 
 components:
   schemas:
@@ -57,6 +63,18 @@ components:
       $ref: './schemas/trainer/TrainerProfile.yaml'
     TrainerSessionInfo:
       $ref: './schemas/trainer/TrainerSessionInfo.yaml'
+    GroupName:
+      $ref: './schemas/group/GroupName.yaml'
+    GroupDescription:
+      $ref: './schemas/group/GroupDescription.yaml'
+    Timezone:
+      $ref: './schemas/group/Timezone.yaml'
+    CancelHours:
+      $ref: './schemas/group/CancelHours.yaml'
+    GroupRole:
+      $ref: './schemas/group/GroupRole.yaml'
+    TrainerGroup:
+      $ref: './schemas/group/TrainerGroup.yaml'
 
   securitySchemes:
     memberSignature:
