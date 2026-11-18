@@ -8,7 +8,7 @@ const PROFILE = 'profile'
 let dbPromise: Promise<IDBDatabase | null> | undefined
 const memoryFallback = new Map<string, unknown>()
 
-function openDb(): Promise<IDBDatabase | null> {
+const openDb = (): Promise<IDBDatabase | null> => {
   dbPromise ??= new Promise((resolve) => {
     try {
       const request = indexedDB.open(DB_NAME, 1)
@@ -23,11 +23,9 @@ function openDb(): Promise<IDBDatabase | null> {
 }
 
 /** False when IndexedDB is unavailable and the identity lives only in memory until the tab closes. */
-export async function isPersistent(): Promise<boolean> {
-  return (await openDb()) !== null
-}
+export const isPersistent = async (): Promise<boolean> => (await openDb()) !== null
 
-async function read<T>(key: string): Promise<T | undefined> {
+const read = async <T>(key: string): Promise<T | undefined> => {
   const db = await openDb()
   if (!db) {
     return memoryFallback.get(key) as T | undefined
@@ -39,7 +37,7 @@ async function read<T>(key: string): Promise<T | undefined> {
   })
 }
 
-async function write(key: string, value: unknown): Promise<void> {
+const write = async (key: string, value: unknown): Promise<void> => {
   const db = await openDb()
   if (!db) {
     if (value === undefined) {

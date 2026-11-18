@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import type { MemberIdentity } from '../api/generated'
 import { loadProfile } from '../crypto/keyStore'
-import { strings } from '../shared/strings'
-import { FirstRunScreen } from './FirstRunScreen'
-import { HomeScreen } from './HomeScreen'
+import { PageLoader } from '../common/components/PageLoader'
+import { FirstRunScreen } from './screens/first-run/FirstRunScreen'
+import { HomeScreen } from './screens/HomeScreen'
 
-export function MemberApp() {
+export const MemberApp = () => {
   const [profile, setProfile] = useState<MemberIdentity | null>()
 
   useEffect(() => {
@@ -13,7 +13,7 @@ export function MemberApp() {
   }, [])
 
   if (profile === undefined) {
-    return <p>{strings.loading}</p>
+    return <PageLoader />
   }
   if (profile === null) {
     return <FirstRunScreen onCreated={setProfile} />

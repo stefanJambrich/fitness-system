@@ -1,24 +1,22 @@
 import { base64url, sha256, utf8 } from './base64url'
 import { keyId } from './identityKey'
 
-/** BR-01 canonical string; must stay byte-for-byte identical to the server's `CanonicalRequest`. */
-export function canonicalString(
+/** BR-01 canonical string; must stay byte-for-byte identical to the server's `SignatureAuthFilter.canonicalString`. */
+export const canonicalString = (
   method: string,
   pathAndQuery: string,
   timestamp: string,
   nonce: string,
   bodyHash: string,
-): string {
-  return [method, pathAndQuery, timestamp, nonce, bodyHash].join('\n')
-}
+): string => [method, pathAndQuery, timestamp, nonce, bodyHash].join('\n')
 
 /** Signs a request and returns the X-Key-Id, X-Timestamp, X-Nonce and X-Signature headers. */
-export async function signatureHeaders(
+export const signatureHeaders = async (
   keyPair: CryptoKeyPair,
   method: string,
   url: string,
   body: string | undefined,
-): Promise<Record<string, string>> {
+): Promise<Record<string, string>> => {
   const target = new URL(url, window.location.origin)
   const timestamp = new Date().toISOString()
   const nonce = base64url(crypto.getRandomValues(new Uint8Array(16)))

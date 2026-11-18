@@ -4,7 +4,7 @@ import type { Middleware } from './generated'
 
 /** Signs every request with the device key (BR-01); requests go out unsigned while there is no key yet. */
 export const signingMiddleware: Middleware = {
-  async pre({ url, init }) {
+  pre: async ({ url, init }) => {
     const keyPair = await loadKeyPair()
     if (!keyPair) {
       return

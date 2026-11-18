@@ -1,6 +1,6 @@
 export type Bytes = Uint8Array<ArrayBuffer>
 
-export function base64url(bytes: Uint8Array): string {
+export const base64url = (bytes: Uint8Array): string => {
   let binary = ''
   for (const byte of bytes) {
     binary += String.fromCharCode(byte)
@@ -8,10 +8,7 @@ export function base64url(bytes: Uint8Array): string {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
-export async function sha256(data: Bytes): Promise<Bytes> {
-  return new Uint8Array(await crypto.subtle.digest('SHA-256', data))
-}
+export const sha256 = async (data: Bytes): Promise<Bytes> =>
+  new Uint8Array(await crypto.subtle.digest('SHA-256', data))
 
-export function utf8(text: string): Bytes {
-  return new TextEncoder().encode(text)
-}
+export const utf8 = (text: string): Bytes => new TextEncoder().encode(text)

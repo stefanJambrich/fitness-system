@@ -1,20 +1,17 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { MemberApp } from './member/MemberApp'
-import { strings } from './shared/strings'
+import { PageShell } from './common/components/PageShell'
 import { TrainerApp } from './trainer/TrainerApp'
 
-function App() {
-  return (
-    <BrowserRouter>
-      <main>
-        <h1>{strings.appName}</h1>
-        <Routes>
-          <Route path="/trainer/*" element={<TrainerApp />} />
-          <Route path="*" element={<MemberApp />} />
-        </Routes>
-      </main>
-    </BrowserRouter>
-  )
-}
+const App = () => (
+  <BrowserRouter>
+    <PageShell>
+      <Routes>
+        <Route path="/trainer/*" element={<TrainerApp />} />
+        <Route path="*" element={<MemberApp />} />
+      </Routes>
+    </PageShell>
+  </BrowserRouter>
+)
 
 export default App

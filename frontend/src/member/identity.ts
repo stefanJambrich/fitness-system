@@ -6,17 +6,13 @@ import { base64url } from '../crypto/base64url'
 import { exportPublicKey, generateIdentityKey } from '../crypto/identityKey'
 import { deleteKeyPair, loadKeyPair, saveKeyPair, saveProfile } from '../crypto/keyStore'
 
-export function formatIdentifier(member: Pick<MemberIdentity, 'nickname' | 'code'>): string {
-  return `${member.nickname}#${member.code}`
-}
-
 const UNUSABLE_KEY_ERRORS = ['DEVICE_UNKNOWN', 'DEVICE_REVOKED', 'MEMBER_DELETED']
 
 /**
  * Registers this device as a new member. A key left over from a failed attempt is reused; if the server
  * already registered it (the response got lost), that identity is recovered instead of creating a second one.
  */
-export async function createIdentity(nickname: string): Promise<MemberIdentity> {
+export const createIdentity = async (nickname: string): Promise<MemberIdentity> => {
   try {
     return await register(nickname)
   } catch (error) {
@@ -33,7 +29,7 @@ export async function createIdentity(nickname: string): Promise<MemberIdentity> 
 }
 
 /** Profile of the already registered key, or undefined when the server no longer accepts that key. */
-async function recoverProfile(): Promise<MemberIdentity | undefined> {
+const recoverProfile = async (): Promise<MemberIdentity | undefined> => {
   try {
     const { memberId, nickname, code } = await membersApi.getMyProfile()
     const profile = { memberId, nickname, code }
@@ -47,7 +43,7 @@ async function recoverProfile(): Promise<MemberIdentity | undefined> {
   }
 }
 
-async function register(nickname: string): Promise<MemberIdentity> {
+const register = async (nickname: string): Promise<MemberIdentity> => {
   let keyPair = await loadKeyPair()
   if (!keyPair) {
     keyPair = await generateIdentityKey()
@@ -66,7 +62,7 @@ async function register(nickname: string): Promise<MemberIdentity> {
   return profile
 }
 
-function deviceLabel(): string {
+const deviceLabel = (): string => {
   const ua = navigator.userAgent
   const browser = /Edg\//.test(ua) ? 'Edge'
     : /Firefox\//.test(ua) ? 'Firefox'
