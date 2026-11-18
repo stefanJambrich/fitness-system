@@ -1,0 +1,29 @@
+post:
+  tags: [groups]
+  operationId: regenerateInviteCode
+  summary: Regenerate the invite code
+  description: >
+    Owner only. Replaces the group's invite code, so the old link, QR code and typed code stop working.
+    Existing members are not affected.
+  security:
+    - trainerSession: []
+  parameters:
+    - name: groupId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: Group with the new invite code
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/TrainerGroup.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'

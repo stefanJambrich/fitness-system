@@ -45,4 +45,14 @@ public interface GroupService {
      * @param groupId   group to delete
      */
     void deleteGroup(UUID trainerId, UUID groupId);
+
+    /**
+     * Replaces the group's invite code, so the old link stops working; existing members stay. Throws
+     * {@code 404 NOT_FOUND}, {@code 403 NOT_GROUP_TRAINER} or {@code 403 OWNER_ONLY}.
+     *
+     * @param trainerId owner of the group
+     * @param groupId   group whose code to replace
+     * @return the group with the new code
+     */
+    GroupTrainer regenerateInviteCode(UUID trainerId, UUID groupId);
 }

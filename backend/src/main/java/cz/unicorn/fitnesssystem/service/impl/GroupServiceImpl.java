@@ -111,6 +111,17 @@ public class GroupServiceImpl implements GroupService {
         access.getGroup().setDeletedAt(now);
     }
 
+    /** {@inheritDoc} */
+    @Override
+    @ReadWriteTransaction
+    public GroupTrainer regenerateInviteCode(UUID trainerId, UUID groupId) {
+        GroupTrainer access = groupAccessService.requireOwner(trainerId, groupId);
+        TrainingGroup group = access.getGroup();
+        group.setInviteCode(uniqueInviteCode());
+        group.setInviteCodeRotatedAt(clock.instant());
+        return access;
+    }
+
     private String uniqueInviteCode() {
         int length = properties.group().inviteCodeLength();
         for (int attempt = 0; attempt < INVITE_CODE_ATTEMPTS; attempt++) {

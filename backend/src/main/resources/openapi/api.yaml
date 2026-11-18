@@ -40,6 +40,8 @@ paths:
     $ref: './paths/group/trainer-groups.yaml'
   /trainer/groups/{groupId}:
     $ref: './paths/group/trainer-groups-by-id.yaml'
+  /trainer/groups/{groupId}/invite-code:
+    $ref: './paths/group/trainer-groups-invite-code.yaml'
 
 components:
   schemas:

@@ -47,4 +47,10 @@ public class GroupController implements GroupsApi {
         groupService.deleteGroup(authHelper.currentTrainer().trainerId(), groupId);
         return ResponseEntity.noContent().build();
     }
+
+    @Override
+    public ResponseEntity<TrainerGroup> regenerateInviteCode(UUID groupId) {
+        UUID trainerId = authHelper.currentTrainer().trainerId();
+        return ResponseEntity.ok(groupMapper.toTrainerGroup(groupService.regenerateInviteCode(trainerId, groupId)));
+    }
 }
