@@ -1,0 +1,27 @@
+post:
+  tags: [trainer-auth]
+  operationId: registerTrainer
+  summary: Register trainer account
+  description: >
+    Creates the account if the e-mail is new and sends a login code. Always answers 202,
+    so it never reveals whether the e-mail is registered.
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [email, displayName]
+          properties:
+            email:
+              $ref: '../../schemas/common/Email.yaml'
+            displayName:
+              $ref: '../../schemas/trainer/DisplayName.yaml'
+  responses:
+    '202':
+      description: Login code sent if the account can log in
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '429':
+      $ref: '../../schemas/common/responses/TooManyRequests.yaml'

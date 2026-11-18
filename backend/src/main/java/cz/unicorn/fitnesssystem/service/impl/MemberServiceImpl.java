@@ -13,11 +13,12 @@ import cz.unicorn.fitnesssystem.entity.MemberDevice;
 import cz.unicorn.fitnesssystem.entity.RequestNonce;
 import cz.unicorn.fitnesssystem.entity.RequestNonceId;
 import cz.unicorn.fitnesssystem.exception.ApiException;
+import cz.unicorn.fitnesssystem.helper.RandomCodeHelper;
+import cz.unicorn.fitnesssystem.helper.RateLimitHelper;
 import cz.unicorn.fitnesssystem.repository.MemberDeviceRepository;
 import cz.unicorn.fitnesssystem.repository.MemberRepository;
 import cz.unicorn.fitnesssystem.repository.RequestNonceRepository;
 import cz.unicorn.fitnesssystem.service.MemberService;
-import java.security.SecureRandom;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.UUID;
@@ -32,24 +33,25 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
-    private static final String CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 4;
     private static final int CODE_ATTEMPTS = 5;
     private static final String DEVICE_KEY_UNIQUE = "member_device_public_key_hash_key";
-
-    private final SecureRandom random = new SecureRandom();
 
     private final MemberRepository memberRepository;
     private final MemberDeviceRepository deviceRepository;
     private final RequestNonceRepository nonceRepository;
     private final SignatureVerifier signatureVerifier;
+    private final RateLimitHelper rateLimitHelper;
     private final AppProperties properties;
     private final Clock clock;
 
     /** {@inheritDoc} */
     @Override
     @ReadWriteTransaction
-    public Member createMember(NewMember newMember, SignedRequest proof) {
+    public Member createMember(NewMember newMember, SignedRequest proof, String clientIp) {
+        AppProperties.Member limits = properties.member();
+        rateLimitHelper.acquire("create-member:" + clientIp, limits.createLimitPerIp(), limits.createLimitWindow());
+
         String nickname = normalizeNickname(newMember.nickname());
         byte[] publicKey = decodePublicKey(newMember.publicKey());
         signatureVerifier.verifyKeyPossession(publicKey, proof);
@@ -132,19 +134,11 @@ public class MemberServiceImpl implements MemberService {
 
     private String uniqueCode(String nickname) {
         for (int attempt = 0; attempt < CODE_ATTEMPTS; attempt++) {
-            String code = randomCode();
+            String code = RandomCodeHelper.code(CODE_LENGTH);
             if (!memberRepository.existsByNicknameAndCode(nickname, code)) {
                 return code;
             }
         }
         throw new IllegalStateException("No free code for nickname after " + CODE_ATTEMPTS + " attempts");
-    }
-
-    private String randomCode() {
-        StringBuilder code = new StringBuilder(CODE_LENGTH);
-        for (int i = 0; i < CODE_LENGTH; i++) {
-            code.append(CODE_ALPHABET.charAt(random.nextInt(CODE_ALPHABET.length())));
-        }
-        return code.toString();
     }
 }

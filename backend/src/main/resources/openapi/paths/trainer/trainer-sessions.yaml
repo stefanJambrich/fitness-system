@@ -1,0 +1,18 @@
+get:
+  tags: [trainer-auth]
+  operationId: listSessions
+  summary: List my logged-in devices
+  description: Active sessions, most recently used first.
+  security:
+    - trainerSession: []
+  responses:
+    '200':
+      description: Active sessions
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../schemas/trainer/TrainerSessionInfo.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'

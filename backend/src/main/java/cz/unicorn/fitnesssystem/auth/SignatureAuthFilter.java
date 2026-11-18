@@ -1,9 +1,11 @@
 package cz.unicorn.fitnesssystem.auth;
 
 import cz.unicorn.fitnesssystem.config.AppProperties;
+import cz.unicorn.fitnesssystem.constant.ApiPaths;
 import cz.unicorn.fitnesssystem.dto.MemberPrincipal;
 import cz.unicorn.fitnesssystem.dto.SignedRequest;
 import cz.unicorn.fitnesssystem.exception.ApiException;
+import cz.unicorn.fitnesssystem.helper.HashHelper;
 import cz.unicorn.fitnesssystem.service.MemberAuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,7 +42,6 @@ public class SignatureAuthFilter extends OncePerRequestFilter {
     private static final int NONCE_BYTES = 16;
     private static final int SIGNATURE_BYTES = 64;
 
-    private static final String MEMBER_API = "/api/me";
     private static final List<GrantedAuthority> MEMBER_AUTHORITIES = AuthorityUtils.createAuthorityList("ROLE_MEMBER");
 
     private final MemberAuthService memberAuthService;
@@ -74,12 +75,12 @@ public class SignatureAuthFilter extends OncePerRequestFilter {
     }
 
     private static boolean isRegistration(HttpServletRequest request) {
-        return HttpMethod.POST.matches(request.getMethod()) && "/api/members".equals(request.getRequestURI());
+        return HttpMethod.POST.matches(request.getMethod()) && ApiPaths.MEMBERS.equals(request.getRequestURI());
     }
 
     private static boolean isMemberApi(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.equals(MEMBER_API) || uri.startsWith(MEMBER_API + "/");
+        return uri.equals(ApiPaths.MEMBER_API) || uri.startsWith(ApiPaths.MEMBER_API + "/");
     }
 
     private static void signIn(MemberPrincipal principal) {
@@ -104,15 +105,21 @@ public class SignatureAuthFilter extends OncePerRequestFilter {
             throw invalid("Malformed " + TIMESTAMP);
         }
 
-        String pathAndQuery = request.getQueryString() == null
-                ? request.getRequestURI()
-                : request.getRequestURI() + "?" + request.getQueryString();
         return new SignedRequest(
                 decode(keyId, KEY_ID, KEY_ID_BYTES),
                 signedAt,
                 decode(nonce, NONCE, NONCE_BYTES),
                 decode(signature, SIGNATURE, SIGNATURE_BYTES),
-                CanonicalRequest.of(request.getMethod(), pathAndQuery, timestamp, nonce, request.getBody()));
+                canonicalString(request, timestamp, nonce));
+    }
+
+    //canonical string, must match frontend/src/crypto/signer.ts byte for byte.
+    private static String canonicalString(CachedBodyRequest request, String timestamp, String nonce) {
+        String pathAndQuery = request.getQueryString() == null
+                ? request.getRequestURI()
+                : request.getRequestURI() + "?" + request.getQueryString();
+        return String.join("\n", request.getMethod(), pathAndQuery, timestamp, nonce,
+                Base64Url.encode(HashHelper.sha256(request.getBody())));
     }
 
     private static byte[] decode(String value, String header, int expectedLength) {

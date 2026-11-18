@@ -1,0 +1,12 @@
+post:
+  tags: [trainer-auth]
+  operationId: logout
+  summary: Log out
+  description: Ends the current session and clears its cookie.
+  security:
+    - trainerSession: []
+  responses:
+    '204':
+      description: Logged out
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'

@@ -5,12 +5,9 @@ import cz.unicorn.fitnesssystem.api.model.ChangeNicknameRequest;
 import cz.unicorn.fitnesssystem.api.model.CreateMemberRequest;
 import cz.unicorn.fitnesssystem.api.model.MemberIdentity;
 import cz.unicorn.fitnesssystem.api.model.MemberProfile;
-import cz.unicorn.fitnesssystem.auth.CurrentMember;
-import cz.unicorn.fitnesssystem.config.AppProperties;
-import cz.unicorn.fitnesssystem.dto.SignedRequest;
 import cz.unicorn.fitnesssystem.entity.Member;
+import cz.unicorn.fitnesssystem.helper.AuthHelper;
 import cz.unicorn.fitnesssystem.mapper.MemberMapper;
-import cz.unicorn.fitnesssystem.ratelimit.RateLimiter;
 import cz.unicorn.fitnesssystem.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +21,13 @@ public class MemberController implements MembersApi {
 
     private final MemberService memberService;
     private final MemberMapper memberMapper;
-    private final CurrentMember currentMember;
-    private final RateLimiter rateLimiter;
-    private final AppProperties properties;
+    private final AuthHelper authHelper;
     private final HttpServletRequest request;
 
     @Override
     public ResponseEntity<MemberIdentity> createMember(CreateMemberRequest createMemberRequest) {
-        AppProperties.Member limits = properties.member();
-        rateLimiter.acquire("create-member:" + request.getRemoteAddr(),
-                limits.createLimitPerIp(), limits.createLimitWindow());
-
-        SignedRequest proof = (SignedRequest) request.getAttribute(SignedRequest.ATTRIBUTE);
-        Member member = memberService.createMember(memberMapper.toNewMember(createMemberRequest), proof);
+        Member member = memberService.createMember(memberMapper.toNewMember(createMemberRequest),
+                authHelper.registrationProof(), request.getRemoteAddr());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -45,12 +36,12 @@ public class MemberController implements MembersApi {
 
     @Override
     public ResponseEntity<MemberProfile> getMyProfile() {
-        return ResponseEntity.ok(memberMapper.toMemberProfile(memberService.getProfile(currentMember.get().memberId())));
+        return ResponseEntity.ok(memberMapper.toMemberProfile(memberService.getProfile(authHelper.currentMember().memberId())));
     }
 
     @Override
     public ResponseEntity<MemberIdentity> changeNickname(ChangeNicknameRequest changeNicknameRequest) {
-        Member member = memberService.changeNickname(currentMember.get().memberId(), changeNicknameRequest.getNickname());
+        Member member = memberService.changeNickname(authHelper.currentMember().memberId(), changeNicknameRequest.getNickname());
         return ResponseEntity.ok(memberMapper.toMemberIdentity(member));
     }
 }

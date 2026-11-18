@@ -1,0 +1,23 @@
+post:
+  tags: [trainer-auth]
+  operationId: requestLoginCode
+  summary: Request a login code
+  description: Sends a login code to the e-mail. Always answers 202, so it never reveals whether the e-mail is registered.
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [email]
+          properties:
+            email:
+              $ref: '../../schemas/common/Email.yaml'
+  responses:
+    '202':
+      description: Login code sent if the account can log in
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '429':
+      $ref: '../../schemas/common/responses/TooManyRequests.yaml'

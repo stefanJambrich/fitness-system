@@ -1,0 +1,16 @@
+get:
+  tags: [trainer-auth]
+  operationId: getTrainerProfile
+  summary: Show the logged-in trainer
+  description: Lets the client check whether its session is still valid.
+  security:
+    - trainerSession: []
+  responses:
+    '200':
+      description: Trainer profile
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/trainer/TrainerProfile.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'

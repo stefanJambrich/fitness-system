@@ -10,6 +10,8 @@ tags:
     description: Smoke test of the contract-first pipeline
   - name: members
     description: Member identity and devices
+  - name: trainer-auth
+    description: Trainer registration, login and sessions
 
 paths:
   /ping:
@@ -18,11 +20,27 @@ paths:
     $ref: './paths/member/members.yaml'
   /me:
     $ref: './paths/member/me.yaml'
+  /trainer/register:
+    $ref: './paths/trainer/trainer-register.yaml'
+  /trainer/login/request:
+    $ref: './paths/trainer/trainer-login-request.yaml'
+  /trainer/login/verify:
+    $ref: './paths/trainer/trainer-login-verify.yaml'
+  /trainer/logout:
+    $ref: './paths/trainer/trainer-logout.yaml'
+  /trainer/me:
+    $ref: './paths/trainer/trainer-me.yaml'
+  /trainer/sessions:
+    $ref: './paths/trainer/trainer-sessions.yaml'
+  /trainer/sessions/{sessionId}:
+    $ref: './paths/trainer/trainer-sessions-by-id.yaml'
 
 components:
   schemas:
     ErrorResponse:
       $ref: './schemas/common/ErrorResponse.yaml'
+    Email:
+      $ref: './schemas/common/Email.yaml'
     PingResponse:
       $ref: './schemas/health/PingResponse.yaml'
     KeyAlgorithm:
@@ -33,6 +51,12 @@ components:
       $ref: './schemas/member/MemberProfile.yaml'
     Nickname:
       $ref: './schemas/member/Nickname.yaml'
+    DisplayName:
+      $ref: './schemas/trainer/DisplayName.yaml'
+    TrainerProfile:
+      $ref: './schemas/trainer/TrainerProfile.yaml'
+    TrainerSessionInfo:
+      $ref: './schemas/trainer/TrainerSessionInfo.yaml'
 
   securitySchemes:
     memberSignature:

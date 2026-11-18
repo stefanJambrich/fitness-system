@@ -1,0 +1,6 @@
+type: string
+format: email
+minLength: 3
+maxLength: 254
+description: Compared case-insensitively.
+example: trainer@example.com

@@ -3,6 +3,7 @@ package cz.unicorn.fitnesssystem.auth;
 import cz.unicorn.fitnesssystem.config.AppProperties;
 import cz.unicorn.fitnesssystem.dto.SignedRequest;
 import cz.unicorn.fitnesssystem.exception.ApiException;
+import cz.unicorn.fitnesssystem.helper.HashHelper;
 import java.nio.charset.StandardCharsets;
 import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
@@ -54,7 +55,7 @@ public class SignatureVerifier {
 
     /** Checks the request is signed by the (not yet registered) key it carries */
     public void verifyKeyPossession(byte[] spki, SignedRequest request) {
-        if (!MessageDigest.isEqual(CanonicalRequest.sha256(spki), request.keyId())
+        if (!MessageDigest.isEqual(HashHelper.sha256(spki), request.keyId())
                 || !verify(parsePublicKey(spki), request)) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "AUTH_INVALID", "Invalid request signature");
         }

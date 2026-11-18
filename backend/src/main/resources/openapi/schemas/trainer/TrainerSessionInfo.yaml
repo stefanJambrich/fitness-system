@@ -1,0 +1,25 @@
+type: object
+description: A device the trainer is logged in on.
+required: [id, remembered, createdAt, lastUsedAt, expiresAt, current]
+properties:
+  id:
+    type: string
+    format: uuid
+  deviceLabel:
+    type: string
+    nullable: true
+    example: Firefox on Linux
+  remembered:
+    type: boolean
+  createdAt:
+    type: string
+    format: date-time
+  lastUsedAt:
+    type: string
+    format: date-time
+  expiresAt:
+    type: string
+    format: date-time
+  current:
+    type: boolean
+    description: True for the session that made this request.

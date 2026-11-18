@@ -1,0 +1,21 @@
+delete:
+  tags: [trainer-auth]
+  operationId: revokeSession
+  summary: Log out a device
+  description: Ends one of my sessions; ending the current one also clears its cookie.
+  security:
+    - trainerSession: []
+  parameters:
+    - name: sessionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '204':
+      description: Session ended
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'

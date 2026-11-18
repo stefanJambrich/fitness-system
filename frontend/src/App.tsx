@@ -1,24 +1,19 @@
-import { useEffect, useState } from 'react'
-import type { MemberIdentity } from './api/generated'
-import { loadProfile } from './crypto/keyStore'
-import { FirstRunScreen } from './member/FirstRunScreen'
-import { HomeScreen } from './member/HomeScreen'
+import { BrowserRouter, Route, Routes } from 'react-router'
+import { MemberApp } from './member/MemberApp'
 import { strings } from './shared/strings'
+import { TrainerApp } from './trainer/TrainerApp'
 
 function App() {
-  const [profile, setProfile] = useState<MemberIdentity | null>()
-
-  useEffect(() => {
-    loadProfile().then((stored) => setProfile(stored ?? null))
-  }, [])
-
   return (
-    <main>
-      <h1>{strings.appName}</h1>
-      {profile === undefined && <p>{strings.loading}</p>}
-      {profile === null && <FirstRunScreen onCreated={setProfile} />}
-      {profile && <HomeScreen profile={profile} />}
-    </main>
+    <BrowserRouter>
+      <main>
+        <h1>{strings.appName}</h1>
+        <Routes>
+          <Route path="/trainer/*" element={<TrainerApp />} />
+          <Route path="*" element={<MemberApp />} />
+        </Routes>
+      </main>
+    </BrowserRouter>
   )
 }
 

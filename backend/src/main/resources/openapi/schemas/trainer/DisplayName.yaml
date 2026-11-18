@@ -1,0 +1,6 @@
+type: string
+minLength: 1
+maxLength: 64
+pattern: '^[^\p{Cc}]+$'
+description: Trimmed by the server; no control characters.
+example: Jana Nováková

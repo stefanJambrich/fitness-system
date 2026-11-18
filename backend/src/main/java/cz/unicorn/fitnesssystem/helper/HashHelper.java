@@ -1,15 +1,11 @@
-package cz.unicorn.fitnesssystem.auth;
+package cz.unicorn.fitnesssystem.helper;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public final class CanonicalRequest {
+public final class HashHelper {
 
-    private CanonicalRequest() {
-    }
-
-    public static String of(String method, String pathAndQuery, String timestamp, String nonce, byte[] body) {
-        return String.join("\n", method, pathAndQuery, timestamp, nonce, Base64Url.encode(sha256(body)));
+    private HashHelper() {
     }
 
     public static byte[] sha256(byte[] data) {

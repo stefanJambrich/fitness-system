@@ -1,4 +1,4 @@
-package cz.unicorn.fitnesssystem.ratelimit;
+package cz.unicorn.fitnesssystem.helper;
 
 import cz.unicorn.fitnesssystem.exception.ApiException;
 import java.time.Clock;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 /** In-memory sliding-window limiter; per instance and lost on restart, enough for one node. */
 @Component
 @RequiredArgsConstructor
-public class RateLimiter {
+public class RateLimitHelper {
 
     private final Clock clock;
     private final Map<String, Window> windows = new ConcurrentHashMap<>();

@@ -1,0 +1,40 @@
+post:
+  tags: [trainer-auth]
+  operationId: verifyLoginCode
+  summary: Log in with a code
+  description: Checks the code and starts a session in the TRAINER_SESSION cookie.
+  security: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [email, code]
+          properties:
+            email:
+              $ref: '../../schemas/common/Email.yaml'
+            code:
+              type: string
+              pattern: '^[0-9]{6}$'
+              example: '042517'
+            rememberDevice:
+              type: boolean
+              default: false
+              description: Keep the session for 90 days instead of 12 hours.
+  responses:
+    '200':
+      description: Logged in
+      headers:
+        Set-Cookie:
+          description: TRAINER_SESSION (HttpOnly; Secure; SameSite=Strict)
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/trainer/TrainerProfile.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'

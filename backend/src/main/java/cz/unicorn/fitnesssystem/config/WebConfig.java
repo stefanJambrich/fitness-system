@@ -1,6 +1,7 @@
 package cz.unicorn.fitnesssystem.config;
 
 import cz.unicorn.fitnesssystem.FitnessSystemApplication;
+import cz.unicorn.fitnesssystem.constant.ApiPaths;
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.addPathPrefix("/api", HandlerTypePredicate
+        configurer.addPathPrefix(ApiPaths.API, HandlerTypePredicate
                 .forBasePackageClass(FitnessSystemApplication.class)
                 .and(HandlerTypePredicate.forAnnotation(RestController.class)));
     }

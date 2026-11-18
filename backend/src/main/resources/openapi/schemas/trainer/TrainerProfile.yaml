@@ -1,0 +1,13 @@
+type: object
+description: The logged-in trainer.
+required: [trainerId, email, displayName]
+properties:
+  trainerId:
+    type: string
+    format: uuid
+  email:
+    type: string
+    example: trainer@example.com
+  displayName:
+    type: string
+    example: Jana Nováková
