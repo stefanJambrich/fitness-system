@@ -48,7 +48,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ApiPaths.PING).permitAll()
                         .requestMatchers(HttpMethod.POST, ApiPaths.MEMBERS).permitAll()
-                        .requestMatchers(ApiPaths.MEMBER_API, ApiPaths.MEMBER_API + "/**").hasRole("MEMBER")
+                        .requestMatchers(ApiPaths.MEMBER_API, ApiPaths.MEMBER_API + "/**", ApiPaths.INVITES + "/**")
+                        .hasRole("MEMBER")
                         .requestMatchers(HttpMethod.POST, ApiPaths.TRAINER_PUBLIC.toArray(String[]::new)).permitAll()
                         .requestMatchers(ApiPaths.TRAINER_API + "/**").hasRole("TRAINER")
                         .anyRequest().denyAll());

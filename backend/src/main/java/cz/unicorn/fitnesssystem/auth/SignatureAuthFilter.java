@@ -27,7 +27,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
- * Authenticates every {@code /api/me} request. Registration has no device to look up yet,
+ * Authenticates every {@code /api/me} and {@code /api/invites} request. Registration has no device to look up yet,
  * so it only gets a clock-skew check and the parsed {@link SignedRequest} as a request attribute.
  */
 @RequiredArgsConstructor
@@ -80,7 +80,8 @@ public class SignatureAuthFilter extends OncePerRequestFilter {
 
     private static boolean isMemberApi(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.equals(ApiPaths.MEMBER_API) || uri.startsWith(ApiPaths.MEMBER_API + "/");
+        return uri.equals(ApiPaths.MEMBER_API) || uri.startsWith(ApiPaths.MEMBER_API + "/")
+                || uri.startsWith(ApiPaths.INVITES + "/");
     }
 
     private static void signIn(MemberPrincipal principal) {

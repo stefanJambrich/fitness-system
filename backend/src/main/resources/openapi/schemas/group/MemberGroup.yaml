@@ -1,0 +1,18 @@
+type: object
+description: A group as seen by one of its members, with the member's credits in it.
+required: [groupId, name, timezone, credit]
+properties:
+  groupId:
+    type: string
+    format: uuid
+  name:
+    type: string
+  description:
+    type: string
+    nullable: true
+  timezone:
+    type: string
+    description: Time zone in which the group's trainings are shown.
+    example: Europe/Prague
+  credit:
+    $ref: '../credit/CreditBalance.yaml'

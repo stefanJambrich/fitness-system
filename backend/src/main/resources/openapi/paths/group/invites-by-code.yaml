@@ -1,0 +1,26 @@
+get:
+  tags: [member-groups]
+  operationId: getInvitePreview
+  summary: Preview a group by its invite code
+  description: Shows the group behind an invite code, so the member can confirm before joining.
+  security:
+    - memberSignature: []
+  parameters:
+    - name: code
+      in: path
+      required: true
+      schema:
+        $ref: '../../schemas/group/InviteCode.yaml'
+  responses:
+    '200':
+      description: The group behind the code
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/InvitePreview.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'

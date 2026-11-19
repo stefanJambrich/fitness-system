@@ -14,6 +14,8 @@ tags:
     description: Trainer registration, login and sessions
   - name: groups
     description: Training groups, managed by their trainers
+  - name: member-groups
+    description: Joining, listing and leaving groups as a member
 
 paths:
   /ping:
@@ -42,6 +44,10 @@ paths:
     $ref: './paths/group/trainer-groups-by-id.yaml'
   /trainer/groups/{groupId}/invite-code:
     $ref: './paths/group/trainer-groups-invite-code.yaml'
+  /invites/{code}:
+    $ref: './paths/group/invites-by-code.yaml'
+  /invites/{code}/join:
+    $ref: './paths/group/invites-join.yaml'
 
 components:
   schemas:
@@ -77,6 +83,14 @@ components:
       $ref: './schemas/group/GroupRole.yaml'
     TrainerGroup:
       $ref: './schemas/group/TrainerGroup.yaml'
+    InviteCode:
+      $ref: './schemas/group/InviteCode.yaml'
+    InvitePreview:
+      $ref: './schemas/group/InvitePreview.yaml'
+    MemberGroup:
+      $ref: './schemas/group/MemberGroup.yaml'
+    CreditBalance:
+      $ref: './schemas/credit/CreditBalance.yaml'
 
   securitySchemes:
     memberSignature:

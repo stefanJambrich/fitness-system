@@ -15,4 +15,7 @@ public interface GroupTrainerRepository extends JpaRepository<GroupTrainer, Grou
 
     @EntityGraph(attributePaths = "group")
     Optional<GroupTrainer> findWithGroupById(GroupTrainerId id);
+
+    @EntityGraph(attributePaths = "trainer")
+    List<GroupTrainer> findAllByIdGroupIdOrderByRoleAscAddedAtAsc(UUID groupId);
 }

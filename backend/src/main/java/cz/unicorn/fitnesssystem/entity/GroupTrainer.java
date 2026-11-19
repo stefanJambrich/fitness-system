@@ -31,6 +31,10 @@ public class GroupTrainer {
     @JoinColumn(name = "group_id")
     private TrainingGroup group;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trainer_id", insertable = false, updatable = false)
+    private Trainer trainer;
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private GroupTrainerRole role;

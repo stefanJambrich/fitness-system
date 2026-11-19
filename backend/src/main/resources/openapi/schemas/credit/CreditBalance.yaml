@@ -1,0 +1,16 @@
+type: object
+description: Credits of one membership. Available = balance − blocked; the balance may be negative (debt).
+required: [balance, blocked, available]
+properties:
+  balance:
+    type: integer
+    description: Sum of all credit transactions.
+    example: 10
+  blocked:
+    type: integer
+    description: Credits held by upcoming sign-ups.
+    example: 2
+  available:
+    type: integer
+    description: Credits free for new sign-ups.
+    example: 8

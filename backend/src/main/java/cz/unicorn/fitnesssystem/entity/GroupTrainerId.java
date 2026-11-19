@@ -1,5 +1,6 @@
 package cz.unicorn.fitnesssystem.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class GroupTrainerId implements Serializable {
 
     private UUID groupId;
 
+    @Column(name = "trainer_id")
     private UUID trainerId;
 
     @Override

@@ -1,0 +1,31 @@
+post:
+  tags: [member-groups]
+  operationId: joinGroup
+  summary: Join (or rejoin) a group
+  description: >
+    Joins the group behind the invite code. Joining a group I am already in changes nothing.
+    Rejoining a group I left brings back my old balance. A member removed by the trainer
+    can't rejoin by link (NOT_MEMBER) and has to ask the trainer.
+  security:
+    - memberSignature: []
+  parameters:
+    - name: code
+      in: path
+      required: true
+      schema:
+        $ref: '../../schemas/group/InviteCode.yaml'
+  responses:
+    '200':
+      description: The joined group with my credits in it
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/MemberGroup.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'

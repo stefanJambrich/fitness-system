@@ -54,4 +54,10 @@ public class GroupMembership {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "removed_by_trainer_id")
     private Trainer removedByTrainer;
+
+    public void rejoin(Instant now) {
+        this.rejoinedAt = now;
+        this.leftAt = null;
+        this.endReason = null;
+    }
 }

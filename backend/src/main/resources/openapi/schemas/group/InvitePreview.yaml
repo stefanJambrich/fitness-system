@@ -1,0 +1,16 @@
+type: object
+description: What a member sees before joining a group by its invite code.
+required: [name, trainers]
+properties:
+  name:
+    type: string
+    example: Tuesday volleyball
+  description:
+    type: string
+    nullable: true
+  trainers:
+    type: array
+    description: Display names of the group's trainers, owner first.
+    items:
+      type: string
+    example: [Jana Nováková]

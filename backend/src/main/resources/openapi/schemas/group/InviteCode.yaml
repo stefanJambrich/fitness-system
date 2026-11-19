@@ -1,0 +1,6 @@
+type: string
+minLength: 1
+maxLength: 12
+pattern: '^[A-Za-z0-9]+$'
+description: Invite code from the join link, QR code or typed by hand; case-insensitive.
+example: K7Q2M9XA
