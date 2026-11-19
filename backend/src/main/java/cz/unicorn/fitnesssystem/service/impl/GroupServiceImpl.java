@@ -116,9 +116,7 @@ public class GroupServiceImpl implements GroupService {
     @ReadWriteTransaction
     public GroupTrainer regenerateInviteCode(UUID trainerId, UUID groupId) {
         GroupTrainer access = groupAccessService.requireOwner(trainerId, groupId);
-        TrainingGroup group = access.getGroup();
-        group.setInviteCode(uniqueInviteCode());
-        group.setInviteCodeRotatedAt(clock.instant());
+        access.getGroup().regenerateInviteCode(uniqueInviteCode(), clock.instant());
         return access;
     }
 

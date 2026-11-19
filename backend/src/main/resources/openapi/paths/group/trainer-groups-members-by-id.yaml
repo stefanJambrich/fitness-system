@@ -14,6 +14,8 @@ delete:
   responses:
     '204':
       description: Member removed
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
     '401':
       $ref: '../../schemas/common/responses/Unauthorized.yaml'
     '403':

@@ -28,10 +28,8 @@ public class TrainingGroup {
     @Setter
     private String description;
 
-    @Setter
     private String inviteCode;
 
-    @Setter
     private Instant inviteCodeRotatedAt;
 
     @Setter
@@ -54,5 +52,10 @@ public class TrainingGroup {
         this.timezone = timezone;
         this.defaultCancelHours = defaultCancelHours;
         this.createdAt = createdAt;
+    }
+
+    public void regenerateInviteCode(String inviteCode, Instant now) {
+        this.inviteCode = inviteCode;
+        this.inviteCodeRotatedAt = now;
     }
 }
