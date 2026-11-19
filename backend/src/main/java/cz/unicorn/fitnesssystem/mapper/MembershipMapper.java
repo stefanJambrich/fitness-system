@@ -1,21 +1,26 @@
 package cz.unicorn.fitnesssystem.mapper;
 
 import cz.unicorn.fitnesssystem.api.model.CreditBalance;
+import cz.unicorn.fitnesssystem.api.model.GroupMember;
 import cz.unicorn.fitnesssystem.api.model.InvitePreview;
 import cz.unicorn.fitnesssystem.api.model.MemberGroup;
 import cz.unicorn.fitnesssystem.api.model.MembershipEndReason;
+import cz.unicorn.fitnesssystem.api.model.MembershipFilter;
 import cz.unicorn.fitnesssystem.api.model.MyGroups;
 import cz.unicorn.fitnesssystem.api.model.TrainingSummary;
 import cz.unicorn.fitnesssystem.dto.GroupInvite;
+import cz.unicorn.fitnesssystem.dto.GroupMemberOverview;
+import cz.unicorn.fitnesssystem.dto.MemberListFilter;
 import cz.unicorn.fitnesssystem.dto.MemberGroups;
 import cz.unicorn.fitnesssystem.dto.MembershipOverview;
 import cz.unicorn.fitnesssystem.entity.GroupMembership;
 import cz.unicorn.fitnesssystem.entity.MembershipCredit;
 import cz.unicorn.fitnesssystem.entity.Training;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(uses = TimeMapper.class)
+@Mapper(uses = {TimeMapper.class, MemberMapper.class})
 public interface MembershipMapper {
 
     @Mapping(target = ".", source = "group")
@@ -27,6 +32,14 @@ public interface MembershipMapper {
     @Mapping(target = "id", source = "membership.group.id")
     @Mapping(target = "endReason", source = "membership")
     MemberGroup toMemberGroup(MembershipOverview overview);
+
+    @Mapping(target = ".", source = "membership")
+    @Mapping(target = "endReason", source = "membership")
+    GroupMember toGroupMember(GroupMemberOverview overview);
+
+    List<GroupMember> toGroupMembers(List<GroupMemberOverview> overviews);
+
+    MemberListFilter toMemberListFilter(MembershipFilter filter);
 
     CreditBalance toCreditBalance(MembershipCredit credit);
 

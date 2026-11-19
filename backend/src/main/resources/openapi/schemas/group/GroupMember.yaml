@@ -1,0 +1,31 @@
+type: object
+description: A membership in a group as seen by its trainer.
+required: [id, member, joinedAt, credit, upcomingBookings]
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Membership id.
+  member:
+    $ref: '../member/MemberIdentity.yaml'
+  joinedAt:
+    type: string
+    format: date-time
+    description: First join.
+  rejoinedAt:
+    type: string
+    format: date-time
+    nullable: true
+    description: Last time the membership was reactivated.
+  leftAt:
+    type: string
+    format: date-time
+    nullable: true
+  endReason:
+    $ref: './MembershipEndReason.yaml'
+  credit:
+    $ref: '../credit/CreditBalance.yaml'
+  upcomingBookings:
+    type: integer
+    description: Sign-ups for trainings that haven't started yet.
+    example: 2

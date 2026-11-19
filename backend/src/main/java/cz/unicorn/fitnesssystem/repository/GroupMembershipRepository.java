@@ -6,19 +6,30 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface GroupMembershipRepository extends JpaRepository<GroupMembership, UUID> {
+public interface GroupMembershipRepository extends JpaRepository<GroupMembership, UUID>,
+        JpaSpecificationExecutor<GroupMembership> {
+
+    @Override
+    @EntityGraph(attributePaths = "member")
+    List<GroupMembership> findAll(Specification<GroupMembership> spec, Sort sort);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<GroupMembership> findAllWithLockByGroupIdOrderById(UUID groupId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<GroupMembership> findWithLockByGroupIdAndMemberId(UUID groupId, UUID memberId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<GroupMembership> findWithLockByIdAndGroupId(UUID id, UUID groupId);
 
     @EntityGraph(attributePaths = "group")
     List<GroupMembership> findAllByMemberIdOrderByGroupNameAsc(UUID memberId);

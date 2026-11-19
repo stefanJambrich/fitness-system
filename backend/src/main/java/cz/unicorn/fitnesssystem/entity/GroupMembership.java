@@ -15,7 +15,6 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -39,18 +38,14 @@ public class GroupMembership {
 
     private Instant joinedAt;
 
-    @Setter
     private Instant rejoinedAt;
 
-    @Setter
     private Instant leftAt;
 
-    @Setter
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private MembershipEnd endReason;
 
-    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "removed_by_trainer_id")
     private Trainer removedByTrainer;
@@ -59,5 +54,14 @@ public class GroupMembership {
         this.rejoinedAt = now;
         this.leftAt = null;
         this.endReason = null;
+        this.removedByTrainer = null;
+    }
+
+    public void remove(Instant now, Trainer trainer) {
+        if (this.leftAt == null) {
+            this.leftAt = now;
+        }
+        this.endReason = MembershipEnd.REMOVED;
+        this.removedByTrainer = trainer;
     }
 }

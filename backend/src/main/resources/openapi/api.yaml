@@ -16,6 +16,8 @@ tags:
     description: Training groups, managed by their trainers
   - name: member-groups
     description: Joining, listing and leaving groups as a member
+  - name: group-members
+    description: Members of a group, managed by its trainers
 
 paths:
   /ping:
@@ -44,6 +46,12 @@ paths:
     $ref: './paths/group/trainer-groups-by-id.yaml'
   /trainer/groups/{groupId}/invite-code:
     $ref: './paths/group/trainer-groups-invite-code.yaml'
+  /trainer/groups/{groupId}/members:
+    $ref: './paths/group/trainer-groups-members.yaml'
+  /trainer/groups/{groupId}/members/{membershipId}:
+    $ref: './paths/group/trainer-groups-members-by-id.yaml'
+  /trainer/groups/{groupId}/members/{membershipId}/restore:
+    $ref: './paths/group/trainer-groups-members-restore.yaml'
   /invites/{code}:
     $ref: './paths/group/invites-by-code.yaml'
   /invites/{code}/join:
@@ -103,6 +111,10 @@ components:
       $ref: './schemas/group/MembershipEndReason.yaml'
     MyGroups:
       $ref: './schemas/group/MyGroups.yaml'
+    MembershipFilter:
+      $ref: './schemas/group/MembershipFilter.yaml'
+    GroupMember:
+      $ref: './schemas/group/GroupMember.yaml'
     TrainingSummary:
       $ref: './schemas/training/TrainingSummary.yaml'
     CreditBalance:

@@ -1,0 +1,4 @@
+type: string
+enum: [active, former, all]
+default: active
+description: Which memberships to list; former ones are members who left or were removed.

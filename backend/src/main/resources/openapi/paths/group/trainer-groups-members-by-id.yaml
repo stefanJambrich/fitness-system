@@ -1,0 +1,22 @@
+delete:
+  tags: [group-members]
+  operationId: removeGroupMember
+  summary: Remove a member from the group
+  description: >
+    Ends the membership and cancels the member's sign-ups for trainings that haven't started; the balance is kept.
+    A removed member can't rejoin by the invite link until a trainer restores them. Removing a member who left
+    marks them as removed too; removing a removed member changes nothing.
+  security:
+    - trainerSession: []
+  parameters:
+    - $ref: '../../schemas/common/parameters/GroupId.yaml'
+    - $ref: '../../schemas/common/parameters/MembershipId.yaml'
+  responses:
+    '204':
+      description: Member removed
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'

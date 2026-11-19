@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -78,10 +76,8 @@ public class MembershipServiceImpl implements MembershipService {
     @Override
     public MemberGroups listMyGroups(UUID memberId) {
         List<GroupMembership> memberships = membershipRepository.findAllByMemberIdOrderByGroupNameAsc(memberId);
-        Map<UUID, MembershipCredit> credits = creditRepository
-                .findAllById(memberships.stream().map(GroupMembership::getId).toList())
-                .stream()
-                .collect(Collectors.toMap(MembershipCredit::getMembershipId, Function.identity()));
+        Map<UUID, MembershipCredit> credits = creditRepository.findAllByIdAsMap(
+                memberships.stream().map(GroupMembership::getId).toList());
         Instant now = clock.instant();
 
         List<MembershipOverview> active = new ArrayList<>();

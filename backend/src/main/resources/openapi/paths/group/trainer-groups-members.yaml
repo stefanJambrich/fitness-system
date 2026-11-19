@@ -1,0 +1,31 @@
+get:
+  tags: [group-members]
+  operationId: listGroupMembers
+  summary: List the members of a group
+  description: Memberships with the member's identifier and credits, ordered by nickname.
+  security:
+    - trainerSession: []
+  parameters:
+    - $ref: '../../schemas/common/parameters/GroupId.yaml'
+    - name: status
+      in: query
+      required: false
+      schema:
+        $ref: '../../schemas/group/MembershipFilter.yaml'
+  responses:
+    '200':
+      description: Members of the group
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../schemas/group/GroupMember.yaml'
+    '400':
+      $ref: '../../schemas/common/responses/BadRequest.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'

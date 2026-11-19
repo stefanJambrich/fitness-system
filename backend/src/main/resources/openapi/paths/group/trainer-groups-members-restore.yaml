@@ -1,0 +1,27 @@
+post:
+  tags: [group-members]
+  operationId: restoreGroupMember
+  summary: Restore a removed member
+  description: >
+    Reactivates a removed membership with its old balance; restoring an active member changes nothing.
+    A member who left by themselves can't be restored (NOT_REMOVED); they rejoin with the invite link.
+  security:
+    - trainerSession: []
+  parameters:
+    - $ref: '../../schemas/common/parameters/GroupId.yaml'
+    - $ref: '../../schemas/common/parameters/MembershipId.yaml'
+  responses:
+    '200':
+      description: The active membership
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/GroupMember.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'
+    '404':
+      $ref: '../../schemas/common/responses/NotFound.yaml'
+    '409':
+      $ref: '../../schemas/common/responses/Conflict.yaml'
