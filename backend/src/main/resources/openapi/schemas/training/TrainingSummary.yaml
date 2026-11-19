@@ -1,0 +1,19 @@
+type: object
+description: Short view of a training, e.g. the next one on a group card.
+required: [id, title, startsAt, endsAt]
+properties:
+  id:
+    type: string
+    format: uuid
+  title:
+    type: string
+    example: Volleyball
+  location:
+    type: string
+    nullable: true
+  startsAt:
+    type: string
+    format: date-time
+  endsAt:
+    type: string
+    format: date-time

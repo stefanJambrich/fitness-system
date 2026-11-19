@@ -1,0 +1,4 @@
+type: string
+enum: [left, removed, group_deleted]
+description: >
+  Why a group is no longer active for the member. Only a group the member left can be rejoined by its invite link.

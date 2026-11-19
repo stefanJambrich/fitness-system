@@ -1,0 +1,18 @@
+get:
+  tags: [member-groups]
+  operationId: listMyGroups
+  summary: List my groups
+  description: >
+    My active groups with my credits and the next upcoming training, and separately the former groups
+    (left, removed by the trainer or deleted), whose balance I keep. Both lists are ordered by name.
+  security:
+    - memberSignature: []
+  responses:
+    '200':
+      description: My active and former groups
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/MyGroups.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'

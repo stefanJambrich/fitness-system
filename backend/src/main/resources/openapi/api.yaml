@@ -48,6 +48,8 @@ paths:
     $ref: './paths/group/invites-by-code.yaml'
   /invites/{code}/join:
     $ref: './paths/group/invites-join.yaml'
+  /me/groups:
+    $ref: './paths/group/me-groups.yaml'
 
 components:
   schemas:
@@ -89,6 +91,12 @@ components:
       $ref: './schemas/group/InvitePreview.yaml'
     MemberGroup:
       $ref: './schemas/group/MemberGroup.yaml'
+    MembershipEndReason:
+      $ref: './schemas/group/MembershipEndReason.yaml'
+    MyGroups:
+      $ref: './schemas/group/MyGroups.yaml'
+    TrainingSummary:
+      $ref: './schemas/training/TrainingSummary.yaml'
     CreditBalance:
       $ref: './schemas/credit/CreditBalance.yaml'
 

@@ -3,6 +3,7 @@ package cz.unicorn.fitnesssystem.controller;
 import cz.unicorn.fitnesssystem.api.MemberGroupsApi;
 import cz.unicorn.fitnesssystem.api.model.InvitePreview;
 import cz.unicorn.fitnesssystem.api.model.MemberGroup;
+import cz.unicorn.fitnesssystem.api.model.MyGroups;
 import cz.unicorn.fitnesssystem.helper.AuthHelper;
 import cz.unicorn.fitnesssystem.mapper.MembershipMapper;
 import cz.unicorn.fitnesssystem.service.MembershipService;
@@ -27,5 +28,11 @@ public class MemberGroupController implements MemberGroupsApi {
     public ResponseEntity<MemberGroup> joinGroup(String code) {
         return ResponseEntity.ok(membershipMapper.toMemberGroup(
                 membershipService.joinGroup(authHelper.currentMember().memberId(), code)));
+    }
+
+    @Override
+    public ResponseEntity<MyGroups> listMyGroups() {
+        return ResponseEntity.ok(membershipMapper.toMyGroups(
+                membershipService.listMyGroups(authHelper.currentMember().memberId())));
     }
 }

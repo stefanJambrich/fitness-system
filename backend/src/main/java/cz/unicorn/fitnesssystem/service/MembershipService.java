@@ -1,7 +1,8 @@
 package cz.unicorn.fitnesssystem.service;
 
 import cz.unicorn.fitnesssystem.dto.GroupInvite;
-import cz.unicorn.fitnesssystem.dto.MembershipWithCredit;
+import cz.unicorn.fitnesssystem.dto.MemberGroups;
+import cz.unicorn.fitnesssystem.dto.MembershipOverview;
 import java.util.UUID;
 
 public interface MembershipService {
@@ -22,7 +23,16 @@ public interface MembershipService {
      *
      * @param memberId   joining member
      * @param inviteCode code from the link, QR code or typed
-     * @return the active membership with its credits
+     * @return the active membership with its credits and next training
      */
-    MembershipWithCredit joinGroup(UUID memberId, String inviteCode);
+    MembershipOverview joinGroup(UUID memberId, String inviteCode);
+
+    /**
+     * Lists the member's groups with their credits, ordered by name. Active ones carry the next upcoming training;
+     * former ones (left, removed or group deleted) are listed separately so their kept balance stays visible.
+     *
+     * @param memberId member
+     * @return active and former memberships
+     */
+    MemberGroups listMyGroups(UUID memberId);
 }

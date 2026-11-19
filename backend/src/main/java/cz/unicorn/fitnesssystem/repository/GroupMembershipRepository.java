@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,6 +19,9 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<GroupMembership> findWithLockByGroupIdAndMemberId(UUID groupId, UUID memberId);
+
+    @EntityGraph(attributePaths = "group")
+    List<GroupMembership> findAllByMemberIdOrderByGroupNameAsc(UUID memberId);
 
     // Native: ON CONFLICT lets a concurrent second join wait for the first instead of failing on membership_unique.
     @Modifying

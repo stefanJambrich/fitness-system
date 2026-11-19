@@ -1,0 +1,13 @@
+type: object
+description: The member's groups, split into active and former ones.
+required: [active, former]
+properties:
+  active:
+    type: array
+    items:
+      $ref: './MemberGroup.yaml'
+  former:
+    type: array
+    description: Groups I left, was removed from or that were deleted; read-only, with the balance I keep.
+    items:
+      $ref: './MemberGroup.yaml'

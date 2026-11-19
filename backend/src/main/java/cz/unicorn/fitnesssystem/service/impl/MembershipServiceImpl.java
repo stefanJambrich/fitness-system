@@ -3,19 +3,30 @@ package cz.unicorn.fitnesssystem.service.impl;
 import cz.unicorn.fitnesssystem.annotation.ReadOnlyTransaction;
 import cz.unicorn.fitnesssystem.annotation.ReadWriteTransaction;
 import cz.unicorn.fitnesssystem.dto.GroupInvite;
-import cz.unicorn.fitnesssystem.dto.MembershipWithCredit;
+import cz.unicorn.fitnesssystem.dto.MemberGroups;
+import cz.unicorn.fitnesssystem.dto.MembershipOverview;
 import cz.unicorn.fitnesssystem.entity.GroupMembership;
+import cz.unicorn.fitnesssystem.entity.MembershipCredit;
 import cz.unicorn.fitnesssystem.entity.MembershipEnd;
+import cz.unicorn.fitnesssystem.entity.Training;
 import cz.unicorn.fitnesssystem.entity.TrainingGroup;
+import cz.unicorn.fitnesssystem.entity.TrainingStatus;
 import cz.unicorn.fitnesssystem.exception.ApiException;
 import cz.unicorn.fitnesssystem.repository.GroupMembershipRepository;
 import cz.unicorn.fitnesssystem.repository.GroupTrainerRepository;
 import cz.unicorn.fitnesssystem.repository.MembershipCreditRepository;
 import cz.unicorn.fitnesssystem.repository.TrainingGroupRepository;
+import cz.unicorn.fitnesssystem.repository.TrainingRepository;
 import cz.unicorn.fitnesssystem.service.MembershipService;
 import java.time.Clock;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +40,7 @@ public class MembershipServiceImpl implements MembershipService {
     private final GroupTrainerRepository groupTrainerRepository;
     private final GroupMembershipRepository membershipRepository;
     private final MembershipCreditRepository creditRepository;
+    private final TrainingRepository trainingRepository;
     private final Clock clock;
 
     /** {@inheritDoc} */
@@ -44,9 +56,10 @@ public class MembershipServiceImpl implements MembershipService {
     /** {@inheritDoc} */
     @Override
     @ReadWriteTransaction
-    public MembershipWithCredit joinGroup(UUID memberId, String inviteCode) {
+    public MembershipOverview joinGroup(UUID memberId, String inviteCode) {
         TrainingGroup group = groupByInviteCode(inviteCode);
-        membershipRepository.insertIfAbsent(group.getId(), memberId, clock.instant());
+        Instant now = clock.instant();
+        membershipRepository.insertIfAbsent(group.getId(), memberId, now);
         GroupMembership membership = membershipRepository.findWithLockByGroupIdAndMemberId(group.getId(), memberId)
                 .orElseThrow();
 
@@ -55,9 +68,38 @@ public class MembershipServiceImpl implements MembershipService {
                     "The trainer removed you from this group, ask them to add you back");
         }
         if (membership.getEndReason() == MembershipEnd.LEFT) {
-            membership.rejoin(clock.instant());
+            membership.rejoin(now);
         }
-        return new MembershipWithCredit(membership, creditRepository.findById(membership.getId()).orElseThrow());
+        return new MembershipOverview(membership, creditRepository.findById(membership.getId()).orElseThrow(),
+                nextTraining(group, now));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public MemberGroups listMyGroups(UUID memberId) {
+        List<GroupMembership> memberships = membershipRepository.findAllByMemberIdOrderByGroupNameAsc(memberId);
+        Map<UUID, MembershipCredit> credits = creditRepository
+                .findAllById(memberships.stream().map(GroupMembership::getId).toList())
+                .stream()
+                .collect(Collectors.toMap(MembershipCredit::getMembershipId, Function.identity()));
+        Instant now = clock.instant();
+
+        List<MembershipOverview> active = new ArrayList<>();
+        List<MembershipOverview> former = new ArrayList<>();
+        for (GroupMembership membership : memberships) {
+            MembershipCredit credit = credits.get(membership.getId());
+            if (membership.getLeftAt() == null && membership.getGroup().getDeletedAt() == null) {
+                active.add(new MembershipOverview(membership, credit, nextTraining(membership.getGroup(), now)));
+            } else {
+                former.add(new MembershipOverview(membership, credit, null));
+            }
+        }
+        return new MemberGroups(active, former);
+    }
+
+    private Training nextTraining(TrainingGroup group, Instant now) {
+        return trainingRepository.findFirstByGroupIdAndStatusAndStartsAtAfterOrderByStartsAtAsc(
+                group.getId(), TrainingStatus.SCHEDULED, now).orElse(null);
     }
 
     private TrainingGroup groupByInviteCode(String inviteCode) {
