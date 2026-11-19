@@ -58,6 +58,8 @@ paths:
     $ref: './paths/group/invites-join.yaml'
   /me/groups:
     $ref: './paths/group/me-groups.yaml'
+  /me/groups/{groupId}/leave:
+    $ref: './paths/group/me-groups-leave.yaml'
 
 components:
   schemas:

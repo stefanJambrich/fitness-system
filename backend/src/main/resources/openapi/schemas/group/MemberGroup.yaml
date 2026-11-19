@@ -4,10 +4,14 @@ description: >
 allOf:
   - $ref: './GroupInfo.yaml'
   - type: object
-    required: [credit]
+    required: [credit, upcomingBookings]
     properties:
       credit:
         $ref: '../credit/CreditBalance.yaml'
+      upcomingBookings:
+        type: integer
+        description: My sign-ups for trainings that haven't started yet; leaving the group cancels them.
+        example: 2
       nextTraining:
         $ref: '../training/TrainingSummary.yaml'
       endReason:

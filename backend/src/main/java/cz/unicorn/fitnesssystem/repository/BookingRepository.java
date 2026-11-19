@@ -6,7 +6,9 @@ import cz.unicorn.fitnesssystem.entity.BookingStatus;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,4 +27,10 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
             GROUP BY b.membership.id""")
     List<BookingCount> countByMembershipIdInAndStatusAndTrainingStartsAtAfter(
             Collection<UUID> membershipIds, BookingStatus status, Instant after);
+
+    default Map<UUID, Long> countUpcomingByMembershipId(Collection<UUID> membershipIds, Instant now) {
+        return countByMembershipIdInAndStatusAndTrainingStartsAtAfter(membershipIds, BookingStatus.BOOKED, now)
+                .stream()
+                .collect(Collectors.toMap(BookingCount::membershipId, BookingCount::count));
+    }
 }

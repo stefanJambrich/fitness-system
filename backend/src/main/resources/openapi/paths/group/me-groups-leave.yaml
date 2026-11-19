@@ -1,0 +1,22 @@
+post:
+  tags: [member-groups]
+  operationId: leaveGroup
+  summary: Leave a group
+  description: >
+    Ends my membership and cancels my sign-ups for trainings that haven't started. The balance stays, even a
+    negative one, and comes back if I rejoin with the invite link.
+  security:
+    - memberSignature: []
+  parameters:
+    - $ref: '../../schemas/common/parameters/GroupId.yaml'
+  responses:
+    '200':
+      description: The group, now among my former groups
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/group/MemberGroup.yaml'
+    '401':
+      $ref: '../../schemas/common/responses/Unauthorized.yaml'
+    '403':
+      $ref: '../../schemas/common/responses/Forbidden.yaml'

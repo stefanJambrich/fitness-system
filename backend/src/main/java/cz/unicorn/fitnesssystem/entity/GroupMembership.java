@@ -57,6 +57,11 @@ public class GroupMembership {
         this.removedByTrainer = null;
     }
 
+    public void leave(Instant now) {
+        this.leftAt = now;
+        this.endReason = MembershipEnd.LEFT;
+    }
+
     public void remove(Instant now, Trainer trainer) {
         if (this.leftAt == null) {
             this.leftAt = now;

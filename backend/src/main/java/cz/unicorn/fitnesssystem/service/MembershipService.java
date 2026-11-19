@@ -35,4 +35,15 @@ public interface MembershipService {
      * @return active and former memberships
      */
     MemberGroups listMyGroups(UUID memberId);
+
+    /**
+     * Ends the member's membership and cancels their sign-ups for trainings that haven't started; sign-ups for
+     * trainings already under way stay for the trainer to resolve. The balance is kept, even a negative one, and
+     * comes back on rejoin. Throws {@code 403 NOT_MEMBER} without an active membership.
+     *
+     * @param memberId leaving member
+     * @param groupId  group to leave
+     * @return the now former membership with its credits
+     */
+    MembershipOverview leaveGroup(UUID memberId, UUID groupId);
 }

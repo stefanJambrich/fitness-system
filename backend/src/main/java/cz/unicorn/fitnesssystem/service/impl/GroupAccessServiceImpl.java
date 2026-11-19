@@ -1,10 +1,13 @@
 package cz.unicorn.fitnesssystem.service.impl;
 
 import cz.unicorn.fitnesssystem.annotation.ReadOnlyTransaction;
+import cz.unicorn.fitnesssystem.annotation.ReadWriteTransaction;
+import cz.unicorn.fitnesssystem.entity.GroupMembership;
 import cz.unicorn.fitnesssystem.entity.GroupTrainer;
 import cz.unicorn.fitnesssystem.entity.GroupTrainerId;
 import cz.unicorn.fitnesssystem.entity.GroupTrainerRole;
 import cz.unicorn.fitnesssystem.exception.ApiException;
+import cz.unicorn.fitnesssystem.repository.GroupMembershipRepository;
 import cz.unicorn.fitnesssystem.repository.GroupTrainerRepository;
 import cz.unicorn.fitnesssystem.repository.TrainingGroupRepository;
 import cz.unicorn.fitnesssystem.service.GroupAccessService;
@@ -20,6 +23,7 @@ public class GroupAccessServiceImpl implements GroupAccessService {
 
     private final GroupTrainerRepository groupTrainerRepository;
     private final TrainingGroupRepository groupRepository;
+    private final GroupMembershipRepository membershipRepository;
 
     /** {@inheritDoc} */
     @Override
@@ -39,5 +43,15 @@ public class GroupAccessServiceImpl implements GroupAccessService {
             throw new ApiException(HttpStatus.FORBIDDEN, "OWNER_ONLY", "Only the group owner can do this");
         }
         return access;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @ReadWriteTransaction
+    public GroupMembership requireMemberWithLock(UUID memberId, UUID groupId) {
+        return membershipRepository.findWithLockByGroupIdAndMemberId(groupId, memberId)
+                .filter(membership -> membership.getLeftAt() == null && membership.getGroup().getDeletedAt() == null)
+                .orElseThrow(() -> new ApiException(HttpStatus.FORBIDDEN, "NOT_MEMBER",
+                        "You are not a member of this group"));
     }
 }

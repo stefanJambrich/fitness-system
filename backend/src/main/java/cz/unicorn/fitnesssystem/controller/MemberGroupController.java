@@ -7,6 +7,7 @@ import cz.unicorn.fitnesssystem.api.model.MyGroups;
 import cz.unicorn.fitnesssystem.helper.AuthHelper;
 import cz.unicorn.fitnesssystem.mapper.MembershipMapper;
 import cz.unicorn.fitnesssystem.service.MembershipService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,5 +35,11 @@ public class MemberGroupController implements MemberGroupsApi {
     public ResponseEntity<MyGroups> listMyGroups() {
         return ResponseEntity.ok(membershipMapper.toMyGroups(
                 membershipService.listMyGroups(authHelper.currentMember().memberId())));
+    }
+
+    @Override
+    public ResponseEntity<MemberGroup> leaveGroup(UUID groupId) {
+        return ResponseEntity.ok(membershipMapper.toMemberGroup(
+                membershipService.leaveGroup(authHelper.currentMember().memberId(), groupId)));
     }
 }

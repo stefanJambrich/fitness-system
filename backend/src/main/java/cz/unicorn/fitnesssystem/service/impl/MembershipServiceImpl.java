@@ -5,6 +5,7 @@ import cz.unicorn.fitnesssystem.annotation.ReadWriteTransaction;
 import cz.unicorn.fitnesssystem.dto.GroupInvite;
 import cz.unicorn.fitnesssystem.dto.MemberGroups;
 import cz.unicorn.fitnesssystem.dto.MembershipOverview;
+import cz.unicorn.fitnesssystem.entity.CancelReason;
 import cz.unicorn.fitnesssystem.entity.GroupMembership;
 import cz.unicorn.fitnesssystem.entity.MembershipCredit;
 import cz.unicorn.fitnesssystem.entity.MembershipEnd;
@@ -12,19 +13,22 @@ import cz.unicorn.fitnesssystem.entity.Training;
 import cz.unicorn.fitnesssystem.entity.TrainingGroup;
 import cz.unicorn.fitnesssystem.entity.TrainingStatus;
 import cz.unicorn.fitnesssystem.exception.ApiException;
+import cz.unicorn.fitnesssystem.repository.BookingRepository;
 import cz.unicorn.fitnesssystem.repository.GroupMembershipRepository;
 import cz.unicorn.fitnesssystem.repository.GroupTrainerRepository;
 import cz.unicorn.fitnesssystem.repository.MembershipCreditRepository;
 import cz.unicorn.fitnesssystem.repository.TrainingGroupRepository;
 import cz.unicorn.fitnesssystem.repository.TrainingRepository;
+import cz.unicorn.fitnesssystem.service.BookingService;
+import cz.unicorn.fitnesssystem.service.GroupAccessService;
 import cz.unicorn.fitnesssystem.service.MembershipService;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -39,6 +43,9 @@ public class MembershipServiceImpl implements MembershipService {
     private final GroupMembershipRepository membershipRepository;
     private final MembershipCreditRepository creditRepository;
     private final TrainingRepository trainingRepository;
+    private final BookingRepository bookingRepository;
+    private final GroupAccessService groupAccessService;
+    private final BookingService bookingService;
     private final Clock clock;
 
     /** {@inheritDoc} */
@@ -68,29 +75,46 @@ public class MembershipServiceImpl implements MembershipService {
         if (membership.getEndReason() == MembershipEnd.LEFT) {
             membership.rejoin(now);
         }
-        return new MembershipOverview(membership, creditRepository.findById(membership.getId()).orElseThrow(),
-                nextTraining(group, now));
+        return loadOverviews(List.of(membership), now).getFirst();
     }
 
     /** {@inheritDoc} */
     @Override
     public MemberGroups listMyGroups(UUID memberId) {
-        List<GroupMembership> memberships = membershipRepository.findAllByMemberIdOrderByGroupNameAsc(memberId);
-        Map<UUID, MembershipCredit> credits = creditRepository.findAllByIdAsMap(
-                memberships.stream().map(GroupMembership::getId).toList());
-        Instant now = clock.instant();
+        Map<Boolean, List<MembershipOverview>> byActive = loadOverviews(
+                membershipRepository.findAllByMemberIdOrderByGroupNameAsc(memberId), clock.instant())
+                .stream()
+                .collect(Collectors.partitioningBy(overview -> isActive(overview.membership())));
+        return new MemberGroups(byActive.get(true), byActive.get(false));
+    }
 
-        List<MembershipOverview> active = new ArrayList<>();
-        List<MembershipOverview> former = new ArrayList<>();
-        for (GroupMembership membership : memberships) {
-            MembershipCredit credit = credits.get(membership.getId());
-            if (membership.getLeftAt() == null && membership.getGroup().getDeletedAt() == null) {
-                active.add(new MembershipOverview(membership, credit, nextTraining(membership.getGroup(), now)));
-            } else {
-                former.add(new MembershipOverview(membership, credit, null));
-            }
+    /** {@inheritDoc} */
+    @Override
+    @ReadWriteTransaction
+    public MembershipOverview leaveGroup(UUID memberId, UUID groupId) {
+        GroupMembership membership = groupAccessService.requireMemberWithLock(memberId, groupId);
+        Instant now = clock.instant();
+        bookingService.cancelUpcomingBookings(membership.getId(), CancelReason.MEMBER_LEFT, now);
+        membership.leave(now);
+        return loadOverviews(List.of(membership), now).getFirst();
+    }
+
+    private List<MembershipOverview> loadOverviews(List<GroupMembership> memberships, Instant now) {
+        if (memberships.isEmpty()) {
+            return List.of();
         }
-        return new MemberGroups(active, former);
+        List<UUID> ids = memberships.stream().map(GroupMembership::getId).toList();
+        Map<UUID, MembershipCredit> credits = creditRepository.findAllByIdAsMap(ids);
+        Map<UUID, Long> upcoming = bookingRepository.countUpcomingByMembershipId(ids, now);
+        return memberships.stream()
+                .map(membership -> new MembershipOverview(membership, credits.get(membership.getId()),
+                        upcoming.getOrDefault(membership.getId(), 0L).intValue(),
+                        isActive(membership) ? nextTraining(membership.getGroup(), now) : null))
+                .toList();
+    }
+
+    private static boolean isActive(GroupMembership membership) {
+        return membership.getLeftAt() == null && membership.getGroup().getDeletedAt() == null;
     }
 
     private Training nextTraining(TrainingGroup group, Instant now) {
