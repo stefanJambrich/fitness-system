@@ -6,9 +6,7 @@ properties:
     type: string
     format: uuid
   deviceLabel:
-    type: string
-    nullable: true
-    example: Firefox on Linux
+    $ref: '../common/DeviceLabel.yaml'
   remembered:
     type: boolean
   createdAt:

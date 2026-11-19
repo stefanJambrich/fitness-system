@@ -1,4 +1,5 @@
 type: string
 maxLength: 1000
+nullable: true
 description: Trimmed by the server; blank means no description.
 example: Mixed level, bring indoor shoes.

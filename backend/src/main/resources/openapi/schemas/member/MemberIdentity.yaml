@@ -6,8 +6,7 @@ properties:
     type: string
     format: uuid
   nickname:
-    type: string
-    example: Karel
+    $ref: './Nickname.yaml'
   code:
     type: string
     example: K7Q2

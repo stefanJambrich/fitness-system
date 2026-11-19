@@ -15,9 +15,7 @@ post:
             email:
               $ref: '../../schemas/common/Email.yaml'
             code:
-              type: string
-              pattern: '^[0-9]{6}$'
-              example: '042517'
+              $ref: '../../schemas/common/OtpCode.yaml'
             rememberDevice:
               type: boolean
               default: false

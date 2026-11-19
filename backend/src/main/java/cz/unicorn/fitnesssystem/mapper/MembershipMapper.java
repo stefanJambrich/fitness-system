@@ -24,7 +24,7 @@ public interface MembershipMapper {
     MyGroups toMyGroups(MemberGroups groups);
 
     @Mapping(target = ".", source = "membership.group")
-    @Mapping(target = "groupId", source = "membership.group.id")
+    @Mapping(target = "id", source = "membership.group.id")
     @Mapping(target = "endReason", source = "membership")
     MemberGroup toMemberGroup(MembershipOverview overview);
 

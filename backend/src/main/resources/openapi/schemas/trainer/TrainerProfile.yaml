@@ -6,8 +6,6 @@ properties:
     type: string
     format: uuid
   email:
-    type: string
-    example: trainer@example.com
+    $ref: '../common/Email.yaml'
   displayName:
-    type: string
-    example: Jana Nováková
+    $ref: './DisplayName.yaml'

@@ -1,0 +1,13 @@
+type: object
+description: Basic data of a group, shared by the trainer's and the member's views of it.
+required: [id, name, timezone]
+properties:
+  id:
+    type: string
+    format: uuid
+  name:
+    $ref: './GroupName.yaml'
+  description:
+    $ref: './GroupDescription.yaml'
+  timezone:
+    $ref: './Timezone.yaml'

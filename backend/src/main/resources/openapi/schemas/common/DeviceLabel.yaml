@@ -1,0 +1,5 @@
+type: string
+maxLength: 64
+nullable: true
+description: Human-readable name of a device, usually browser and operating system.
+example: Firefox on Linux

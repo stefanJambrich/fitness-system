@@ -9,11 +9,7 @@ post:
   security:
     - memberSignature: []
   parameters:
-    - name: code
-      in: path
-      required: true
-      schema:
-        $ref: '../../schemas/group/InviteCode.yaml'
+    - $ref: '../../schemas/common/parameters/InviteCode.yaml'
   responses:
     '200':
       description: The joined group with my credits in it

@@ -1,10 +1,5 @@
 parameters:
-  - name: groupId
-    in: path
-    required: true
-    schema:
-      type: string
-      format: uuid
+  - $ref: '../../schemas/common/parameters/GroupId.yaml'
 patch:
   tags: [groups]
   operationId: updateGroup

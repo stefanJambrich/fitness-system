@@ -57,6 +57,10 @@ components:
       $ref: './schemas/common/ErrorResponse.yaml'
     Email:
       $ref: './schemas/common/Email.yaml'
+    DeviceLabel:
+      $ref: './schemas/common/DeviceLabel.yaml'
+    OtpCode:
+      $ref: './schemas/common/OtpCode.yaml'
     PingResponse:
       $ref: './schemas/health/PingResponse.yaml'
     KeyAlgorithm:
@@ -67,6 +71,8 @@ components:
       $ref: './schemas/member/MemberProfile.yaml'
     Nickname:
       $ref: './schemas/member/Nickname.yaml'
+    PublicKey:
+      $ref: './schemas/member/PublicKey.yaml'
     DisplayName:
       $ref: './schemas/trainer/DisplayName.yaml'
     TrainerProfile:
@@ -83,6 +89,8 @@ components:
       $ref: './schemas/group/CancelHours.yaml'
     GroupRole:
       $ref: './schemas/group/GroupRole.yaml'
+    GroupInfo:
+      $ref: './schemas/group/GroupInfo.yaml'
     TrainerGroup:
       $ref: './schemas/group/TrainerGroup.yaml'
     InviteCode:

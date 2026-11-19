@@ -18,17 +18,11 @@ post:
             nickname:
               $ref: '../../schemas/member/Nickname.yaml'
             publicKey:
-              type: string
-              minLength: 1
-              maxLength: 512
-              pattern: '^[A-Za-z0-9_-]+$'
-              description: SPKI-encoded public key, base64url without padding.
+              $ref: '../../schemas/member/PublicKey.yaml'
             algorithm:
               $ref: '../../schemas/member/KeyAlgorithm.yaml'
             deviceLabel:
-              type: string
-              maxLength: 64
-              example: Firefox on Linux
+              $ref: '../../schemas/common/DeviceLabel.yaml'
   responses:
     '201':
       description: Member created

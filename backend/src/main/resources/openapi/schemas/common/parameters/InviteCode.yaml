@@ -1,0 +1,5 @@
+name: code
+in: path
+required: true
+schema:
+  $ref: '../../group/InviteCode.yaml'

@@ -1,26 +1,15 @@
-type: object
 description: A group as seen by one of its trainers.
-required: [id, name, inviteCode, timezone, defaultCancelHours, role, createdAt]
-properties:
-  id:
-    type: string
-    format: uuid
-  name:
-    type: string
-  description:
-    type: string
-    nullable: true
-  inviteCode:
-    type: string
-    description: Code of the join link `/join/{inviteCode}`.
-    example: K7Q2M9XA
-  timezone:
-    type: string
-    example: Europe/Prague
-  defaultCancelHours:
-    type: integer
-  role:
-    $ref: './GroupRole.yaml'
-  createdAt:
-    type: string
-    format: date-time
+allOf:
+  - $ref: './GroupInfo.yaml'
+  - type: object
+    required: [inviteCode, defaultCancelHours, role, createdAt]
+    properties:
+      inviteCode:
+        $ref: './InviteCode.yaml'
+      defaultCancelHours:
+        $ref: './CancelHours.yaml'
+      role:
+        $ref: './GroupRole.yaml'
+      createdAt:
+        type: string
+        format: date-time
