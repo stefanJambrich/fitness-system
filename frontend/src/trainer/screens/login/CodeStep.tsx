@@ -4,7 +4,8 @@ import type { FormEvent } from 'react'
 import { trainerAuthApi } from '../../../api/client'
 import type { TrainerProfile } from '../../../api/generated'
 import { strings } from '../../../common/strings'
-import { CODE_ERRORS, errorMessage } from './loginErrors'
+import { errorMessage } from '../../../common/utils/errorMessage'
+import { CODE_ERRORS } from './loginErrors'
 
 type Props = {
   email: string

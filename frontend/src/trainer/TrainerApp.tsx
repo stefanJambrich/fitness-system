@@ -4,6 +4,7 @@ import { PageLoader } from '../common/components/PageLoader'
 import { TRAINER_PATHS } from '../common/paths'
 import { strings } from '../common/strings'
 import { useTrainerAuth } from './hooks/useTrainerAuth'
+import { AccountScreen } from './screens/account/AccountScreen'
 import { TrainerHomeScreen } from './screens/home/TrainerHomeScreen'
 import { TrainerLoginScreen } from './screens/login/TrainerLoginScreen'
 
@@ -28,11 +29,10 @@ export const TrainerApp = () => {
           : <TrainerLoginScreen onLoggedIn={logIn} sessionExpired={sessionExpired} />}
       />
       <Route element={<RequireTrainer loggedIn={trainer !== null} />}>
+        <Route index element={<TrainerHomeScreen onSessionExpired={expire} />} />
         <Route
-          index
-          element={trainer && (
-            <TrainerHomeScreen trainer={trainer} onLoggedOut={logOut} onSessionExpired={expire} />
-          )}
+          path="account"
+          element={trainer && <AccountScreen trainer={trainer} onLoggedOut={logOut} onSessionExpired={expire} />}
         />
       </Route>
       <Route path="*" element={<Navigate to={TRAINER_PATHS.home} replace />} />

@@ -1,48 +1,25 @@
-import { Stack } from '@mantine/core'
+import { Anchor, Stack } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import type { TrainerProfile } from '../../../api/generated'
-import { useTrainerSessions } from '../../hooks/useTrainerSessions'
-import { AccountCard } from './AccountCard'
-import { DevicesCard } from './DevicesCard'
-import { LogOutOthersModal } from './LogOutOthersModal'
+import { Link } from 'react-router'
+import { TRAINER_PATHS } from '../../../common/paths'
+import { strings } from '../../../common/strings'
+import { useTrainerGroups } from '../../hooks/useTrainerGroups'
+import { CreateGroupModal } from './CreateGroupModal'
+import { GroupsCard } from './GroupsCard'
 
 type Props = {
-  trainer: TrainerProfile
-  onLoggedOut: () => void
   onSessionExpired: () => void
 }
 
-export const TrainerHomeScreen = ({ trainer, onLoggedOut, onSessionExpired }: Props) => {
-  const devices = useTrainerSessions(onLoggedOut, onSessionExpired)
-  const [confirmOpen, confirm] = useDisclosure(false)
-
-  const confirmRevokeOthers = async () => {
-    await devices.revokeOthers()
-    confirm.close()
-  }
+export const TrainerHomeScreen = ({ onSessionExpired }: Props) => {
+  const { groups, error, createGroup } = useTrainerGroups(onSessionExpired)
+  const [createOpen, create] = useDisclosure(false)
 
   return (
     <Stack>
-      <AccountCard
-        trainer={trainer}
-        loggingOut={devices.loggingOut}
-        disabled={devices.busy !== undefined}
-        onLogOut={devices.logOut}
-      />
-      <DevicesCard
-        sessions={devices.sessions}
-        error={devices.error}
-        busy={devices.busy}
-        onRevoke={devices.revokeSession}
-        onRevokeOthers={confirm.open}
-      />
-      <LogOutOthersModal
-        opened={confirmOpen}
-        count={devices.others.length}
-        busy={devices.revokingOthers}
-        onClose={confirm.close}
-        onConfirm={confirmRevokeOthers}
-      />
+      <GroupsCard groups={groups} error={error} onNewGroup={create.open} />
+      <Anchor component={Link} to={TRAINER_PATHS.account} ta="center">{strings.trainerAccountLink}</Anchor>
+      <CreateGroupModal opened={createOpen} onClose={create.close} onCreate={createGroup} />
     </Stack>
   )
 }

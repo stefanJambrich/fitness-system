@@ -67,4 +67,21 @@ export const strings = {
   trainerLogOutOthersConfirm: (count: number) =>
     `You will have to log in again on ${count === 1 ? '1 other device' : `${count} other devices`}.`,
   cancel: 'Cancel',
+  trainerBackToGroups: '← My groups',
+  trainerAccountLink: 'Account and devices',
+
+  groupsTitle: 'My groups',
+  groupsEmpty: 'No groups yet. Create one and share its invite link with your members.',
+  groupsNew: 'New group',
+  groupCoTrainer: 'Co-trainer',
+  groupCreateTitle: 'New group',
+  groupNameLabel: 'Name',
+  groupNameInvalid: 'Use 1–80 characters.',
+  groupDescriptionLabel: 'Description (optional)',
+  groupCancelHoursLabel: 'Cancel deadline (hours before start)',
+  groupCancelHoursHint: '0 = members can cancel until the training starts.',
+  groupCancelHoursInvalid: 'Use a whole number from 0 to 720.',
+  groupTimezoneNote: (timezone: string) => `Training times will be shown in ${timezone}, the time zone of this device.`,
+  groupCreate: 'Create group',
+  groupFormInvalid: 'Check the name and the cancel deadline.',
 } as const

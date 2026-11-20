@@ -3,7 +3,8 @@ import { isEmail, useForm } from '@mantine/form'
 import { useState } from 'react'
 import { trainerAuthApi } from '../../../api/client'
 import { strings } from '../../../common/strings'
-import { errorMessage, REQUEST_ERRORS } from './loginErrors'
+import { errorMessage } from '../../../common/utils/errorMessage'
+import { REQUEST_ERRORS } from './loginErrors'
 
 type Props = {
   initialEmail: string
